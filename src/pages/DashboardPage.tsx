@@ -25,7 +25,7 @@ export function DashboardPage() {
   const [endDate, setEndDate] = useState('')
   const [activeCategory, setActiveCategory] = useState('All')
   const [search, setSearch] = useState('')
-  const [viewMode, setViewMode] = useState<ViewMode>('cards')
+  const [viewMode, setViewMode] = useState<ViewMode>('grouped')
 
   const { biomarkers, grouped, loading, error } = useBiomarkers(user?.id, {
     startDate: startDate || undefined,
