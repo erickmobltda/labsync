@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import type { BiomarkerWithDate } from '@/types'
 import { useNavigate } from 'react-router-dom'
 import { Upload, BarChart3 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
@@ -6,6 +7,7 @@ import { useBiomarkers } from '@/hooks/useBiomarkers'
 import { BiomarkerCard } from '@/components/dashboard/BiomarkerCard'
 import { BiomarkerChart } from '@/components/dashboard/BiomarkerChart'
 import { InsightsPanel } from '@/components/dashboard/InsightsPanel'
+import { CategoryGroupCard } from '@/components/dashboard/CategoryGroupCard'
 import { CategoryTabs } from '@/components/dashboard/CategoryTabs'
 import { DateRangePicker } from '@/components/dashboard/DateRangePicker'
 import { SearchFilter } from '@/components/dashboard/SearchFilter'
@@ -13,7 +15,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { Button } from '@/components/ui/button'
 import { ALL_CATEGORIES } from '@/lib/categories'
 
-type ViewMode = 'cards' | 'charts'
+type ViewMode = 'cards' | 'charts' | 'grouped'
 
 export function DashboardPage() {
   const { user } = useAuth()
@@ -38,6 +40,18 @@ export function DashboardPage() {
 
   const biomarkerNames = Object.keys(grouped)
 
+  // Group biomarkers by category for the grouped view
+  const byCategory = Object.entries(grouped).reduce((acc, [name, entries]) => {
+    const cat = entries[0]?.category ?? 'Other'
+    if (!acc[cat]) acc[cat] = {}
+    acc[cat][name] = entries
+    return acc
+  }, {} as Record<string, Record<string, BiomarkerWithDate[]>>)
+
+  const sortedCategories = Object.keys(byCategory).sort(
+    (a, b) => ALL_CATEGORIES.indexOf(a) - ALL_CATEGORIES.indexOf(b)
+  )
+
   return (
     <div className="p-4 lg:p-6 space-y-5 max-w-7xl mx-auto">
       {/* Page header */}
@@ -52,18 +66,15 @@ export function DashboardPage() {
         </div>
         <div className="flex items-center gap-2">
           <div className="flex rounded-lg border border-gray-200 p-0.5">
-            <button
-              onClick={() => setViewMode('cards')}
-              className={`rounded px-2.5 py-1.5 text-xs font-medium transition-colors ${viewMode === 'cards' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
-            >
-              Cards
-            </button>
-            <button
-              onClick={() => setViewMode('charts')}
-              className={`rounded px-2.5 py-1.5 text-xs font-medium transition-colors ${viewMode === 'charts' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
-            >
-              Charts
-            </button>
+            {(['cards', 'grouped', 'charts'] as ViewMode[]).map(mode => (
+              <button
+                key={mode}
+                onClick={() => setViewMode(mode)}
+                className={`rounded px-2.5 py-1.5 text-xs font-medium capitalize transition-colors ${viewMode === mode ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
+              >
+                {mode}
+              </button>
+            ))}
           </div>
           <Button size="sm" onClick={() => navigate('/upload')}>
             <Upload className="h-4 w-4" />
@@ -135,6 +146,12 @@ export function DashboardPage() {
               entries={grouped[name]}
               onClick={() => setViewMode('charts')}
             />
+          ))}
+        </div>
+      ) : viewMode === 'grouped' ? (
+        <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
+          {sortedCategories.map(cat => (
+            <CategoryGroupCard key={cat} category={cat} grouped={byCategory[cat]} />
           ))}
         </div>
       ) : (
