@@ -46,8 +46,18 @@ export function BiomarkerCard({ name, entries, onClick }: BiomarkerCardProps) {
             <Badge variant={statusVariant} className="capitalize">
               {statusVariant}
             </Badge>
-            {trend === 'up' && <TrendingUp className="h-4 w-4 text-red-400" />}
-            {trend === 'down' && <TrendingDown className="h-4 w-4 text-green-400" />}
+            {trend === 'up' && (
+              <TrendingUp className={`h-4 w-4 ${
+                statusVariant === 'high' ? 'text-red-400' :
+                statusVariant === 'low' ? 'text-green-400' : 'text-gray-300'
+              }`} />
+            )}
+            {trend === 'down' && (
+              <TrendingDown className={`h-4 w-4 ${
+                statusVariant === 'low' ? 'text-red-400' :
+                statusVariant === 'high' ? 'text-green-400' : 'text-gray-300'
+              }`} />
+            )}
             {trend === 'flat' && <Minus className="h-4 w-4 text-gray-300" />}
           </div>
         </div>

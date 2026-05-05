@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useBiomarkers } from '@/hooks/useBiomarkers'
 import { BiomarkerCard } from '@/components/dashboard/BiomarkerCard'
 import { BiomarkerChart } from '@/components/dashboard/BiomarkerChart'
+import { InsightsPanel } from '@/components/dashboard/InsightsPanel'
 import { CategoryTabs } from '@/components/dashboard/CategoryTabs'
 import { DateRangePicker } from '@/components/dashboard/DateRangePicker'
 import { SearchFilter } from '@/components/dashboard/SearchFilter'
@@ -91,6 +92,14 @@ export function DashboardPage() {
           onChange={setActiveCategory}
         />
       </div>
+
+      {/* Insights */}
+      {!loading && !error && biomarkerNames.length > 0 && (
+        <InsightsPanel
+          grouped={grouped}
+          onSelectBiomarker={() => setViewMode('charts')}
+        />
+      )}
 
       {/* Content */}
       {loading ? (
