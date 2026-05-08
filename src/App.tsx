@@ -10,6 +10,10 @@ import { DashboardPage } from '@/pages/DashboardPage'
 import { UploadPage } from '@/pages/UploadPage'
 import { ReportsPage } from '@/pages/ReportsPage'
 import { ReportDetailPage } from '@/pages/ReportDetailPage'
+import { AppointmentsPage } from '@/pages/AppointmentsPage'
+import { AppointmentFormPage } from '@/pages/AppointmentFormPage'
+import { MedicinesPage } from '@/pages/MedicinesPage'
+import { MedicineFormPage } from '@/pages/MedicineFormPage'
 import { Spinner } from '@/components/ui/spinner'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -91,6 +95,12 @@ export default function App() {
           <Route path="/upload" element={<UploadPage />} />
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/reports/:id" element={<ReportDetailPage />} />
+          <Route path="/appointments" element={<AppointmentsPage />} />
+          <Route path="/appointments/new" element={<AppointmentFormPage />} />
+          <Route path="/appointments/:id" element={<AppointmentFormPage />} />
+          <Route path="/medicines" element={<MedicinesPage />} />
+          <Route path="/medicines/new" element={<MedicineFormPage />} />
+          <Route path="/medicines/:id" element={<MedicineFormPage />} />
         </Route>
         <Route path="*" element={<CatchAll />} />
       </Routes>

@@ -4,9 +4,12 @@ import { useNavigate } from 'react-router-dom'
 import { Upload, BarChart3 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useBiomarkers } from '@/hooks/useBiomarkers'
+import { useAppointments } from '@/hooks/useAppointments'
+import { useMedicines } from '@/hooks/useMedicines'
 import { BiomarkerCard } from '@/components/dashboard/BiomarkerCard'
 import { BiomarkerChart } from '@/components/dashboard/BiomarkerChart'
 import { InsightsPanel } from '@/components/dashboard/InsightsPanel'
+import { HealthSummaryPanel } from '@/components/dashboard/HealthSummaryPanel'
 import { CategoryGroupCard } from '@/components/dashboard/CategoryGroupCard'
 import { CategoryTabs } from '@/components/dashboard/CategoryTabs'
 import { DateRangePicker } from '@/components/dashboard/DateRangePicker'
@@ -33,6 +36,8 @@ export function DashboardPage() {
     category: activeCategory !== 'All' ? activeCategory : undefined,
     search: search || undefined,
   })
+  const { appointments } = useAppointments(user?.id)
+  const { medicines } = useMedicines(user?.id)
 
   const availableCategories = Array.from(
     new Set(biomarkers.map(b => b.category ?? 'Other'))
@@ -82,6 +87,9 @@ export function DashboardPage() {
           </Button>
         </div>
       </div>
+
+      {/* Health summary */}
+      <HealthSummaryPanel appointments={appointments} medicines={medicines} />
 
       {/* Filters */}
       <div className="flex flex-col gap-3 rounded-xl bg-white border border-gray-100 p-4 shadow-sm">
