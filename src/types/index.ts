@@ -77,6 +77,7 @@ export interface Medicine {
   prescription_required: boolean
   bought_on: string | null
   pills_bought: number | null
+  schedule: string | null
   notes: string | null
   created_at: string
 }

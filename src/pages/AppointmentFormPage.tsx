@@ -9,7 +9,8 @@ import { Label } from '@/components/ui/label'
 import { Spinner } from '@/components/ui/spinner'
 import { ToastContainer, useToast } from '@/components/ui/toast'
 import { cn, todayISO } from '@/lib/utils'
-import { APPOINTMENT_TYPES, SPECIALTIES_BY_TYPE, TYPE_LABEL } from '@/lib/appointments'
+import { APPOINTMENT_TYPES, SPECIALTIES_BY_TYPE } from '@/lib/appointments'
+import { useT } from '@/lib/i18n'
 import type { AppointmentType } from '@/types'
 
 const selectClasses =
@@ -22,6 +23,7 @@ export function AppointmentFormPage() {
   const navigate = useNavigate()
   const { saveAppointment, updateAppointment, getAppointment } = useAppointments(user?.id)
   const { toasts, toast, close } = useToast()
+  const { t } = useT()
 
   const [type, setType] = useState<AppointmentType>('doctor')
   const [specialty, setSpecialty] = useState<string>(SPECIALTIES_BY_TYPE.doctor[0])
@@ -44,7 +46,7 @@ export function AppointmentFormPage() {
         setTime(existing.time ? existing.time.slice(0, 5) : '')
         setNotes(existing.notes ?? '')
       } catch (err) {
-        toast(err instanceof Error ? err.message : 'Failed to load', 'error')
+        toast(err instanceof Error ? err.message : t('appt.loadFailed'), 'error')
       } finally {
         if (!cancelled) setLoadingExisting(false)
       }
@@ -74,14 +76,14 @@ export function AppointmentFormPage() {
     try {
       if (isEdit && id) {
         await updateAppointment(id, payload)
-        toast('Appointment updated', 'success')
+        toast(t('apptForm.updated'), 'success')
       } else {
         await saveAppointment(payload)
-        toast('Appointment added', 'success')
+        toast(t('apptForm.added'), 'success')
       }
       navigate('/appointments')
     } catch (err) {
-      toast(err instanceof Error ? err.message : 'Failed to save', 'error')
+      toast(err instanceof Error ? err.message : t('appt.saveFailed'), 'error')
       setSubmitting(false)
     }
   }
@@ -101,30 +103,30 @@ export function AppointmentFormPage() {
         className="mb-4 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
       >
         <ArrowLeft className="h-4 w-4" />
-        Back to appointments
+        {t('apptForm.back')}
       </button>
 
       <h1 className="text-xl font-bold text-gray-900 mb-6">
-        {isEdit ? 'Edit appointment' : 'New appointment'}
+        {isEdit ? t('apptForm.editTitle') : t('apptForm.newTitle')}
       </h1>
 
       <form onSubmit={handleSubmit} className="space-y-5 rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
         <div className="space-y-1.5">
-          <Label htmlFor="type">Type</Label>
+          <Label htmlFor="type">{t('apptForm.type')}</Label>
           <select
             id="type"
             className={selectClasses}
             value={type}
             onChange={e => handleTypeChange(e.target.value as AppointmentType)}
           >
-            {APPOINTMENT_TYPES.map(t => (
-              <option key={t} value={t}>{TYPE_LABEL[t]}</option>
+            {APPOINTMENT_TYPES.map(opt => (
+              <option key={opt} value={opt}>{t(`apptType.${opt}`)}</option>
             ))}
           </select>
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="specialty">Specialty</Label>
+          <Label htmlFor="specialty">{t('apptForm.specialty')}</Label>
           <select
             id="specialty"
             className={selectClasses}
@@ -132,40 +134,40 @@ export function AppointmentFormPage() {
             onChange={e => setSpecialty(e.target.value)}
           >
             {SPECIALTIES_BY_TYPE[type].map(s => (
-              <option key={s} value={s}>{s}</option>
+              <option key={s} value={s}>{t(`specialty.${s}`)}</option>
             ))}
           </select>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <Label htmlFor="date">Date</Label>
+            <Label htmlFor="date">{t('apptForm.date')}</Label>
             <Input id="date" type="date" required value={date} onChange={e => setDate(e.target.value)} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="time">Time</Label>
+            <Label htmlFor="time">{t('apptForm.time')}</Label>
             <Input id="time" type="time" value={time} onChange={e => setTime(e.target.value)} />
           </div>
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="notes">Notes</Label>
+          <Label htmlFor="notes">{t('apptForm.notes')}</Label>
           <textarea
             id="notes"
             rows={4}
             value={notes}
             onChange={e => setNotes(e.target.value)}
-            placeholder="Anything to remember about this appointment..."
+            placeholder={t('apptForm.notesPlaceholder')}
             className={cn(selectClasses, 'h-auto py-2 resize-y')}
           />
         </div>
 
         <div className="flex items-center justify-end gap-2 pt-2">
           <Button type="button" variant="outline" onClick={() => navigate('/appointments')}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button type="submit" disabled={submitting}>
-            {submitting ? <Spinner size="sm" /> : isEdit ? 'Save changes' : 'Add appointment'}
+            {submitting ? <Spinner size="sm" /> : isEdit ? t('apptForm.saveChanges') : t('apptForm.add')}
           </Button>
         </div>
       </form>
