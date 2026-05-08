@@ -20,7 +20,8 @@ const STATUS_COLOR: Record<string, string> = {
 }
 
 export function BiomarkerChart({ name, entries }: BiomarkerChartProps) {
-  const { t, formatDateShort } = useT()
+  const { t, tBiomarker, formatDateShort } = useT()
+  const displayName = tBiomarker(name)
   const sorted = [...entries].sort((a, b) => a.report_date.localeCompare(b.report_date))
   const latest = sorted[sorted.length - 1]
   const unit = latest?.unit ?? ''
@@ -48,7 +49,7 @@ export function BiomarkerChart({ name, entries }: BiomarkerChartProps) {
     <Card className="animate-fade-in">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-sm">{name}</CardTitle>
+          <CardTitle className="text-sm">{displayName}</CardTitle>
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-400">{unit}</span>
             <Badge variant={statusVariant} className="text-xs">
@@ -70,7 +71,7 @@ export function BiomarkerChart({ name, entries }: BiomarkerChartProps) {
               <YAxis tick={{ fontSize: 10, fill: '#94A3B8' }} tickLine={false} axisLine={false} />
               <Tooltip
                 contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #E2E8F0', padding: '6px 10px' }}
-                formatter={(value: number) => [`${value} ${unit}`, name]}
+                formatter={(value: number) => [`${value} ${unit}`, displayName]}
                 labelStyle={{ color: '#64748B', marginBottom: 2 }}
               />
               {refMin != null && (

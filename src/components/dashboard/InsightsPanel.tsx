@@ -27,7 +27,7 @@ function trendIsImproving(status: string, trend: string) {
 }
 
 export function InsightsPanel({ grouped, onSelectBiomarker }: InsightsPanelProps) {
-  const { t } = useT()
+  const { t, tBiomarker } = useT()
   const entries = Object.entries(grouped).map(([name, data]) => ({
     name,
     latest: getLatest(data),
@@ -111,7 +111,7 @@ export function InsightsPanel({ grouped, onSelectBiomarker }: InsightsPanelProps
                       : 'border-amber-100 bg-amber-50 hover:border-amber-200'
                   }`}
                 >
-                  <p className="text-xs font-medium text-gray-700 max-w-32 truncate">{name}</p>
+                  <p className="text-xs font-medium text-gray-700 max-w-32 truncate">{tBiomarker(name)}</p>
                   <div className="mt-0.5 flex items-baseline gap-1">
                     <span className={`text-lg font-bold ${isHigh ? 'text-red-600' : 'text-amber-600'}`}>
                       {latest.value}

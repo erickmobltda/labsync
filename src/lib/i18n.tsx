@@ -60,6 +60,92 @@ const dictionaries: Record<Language, Record<string, string>> = {
     'category.Other': 'Outros',
     'category.All': 'Todos',
 
+    // Biomarkers (DB stores canonical English names — these are display-only translations)
+    'biomarker.HDL': 'HDL',
+    'biomarker.HDL Cholesterol': 'Colesterol HDL',
+    'biomarker.LDL': 'LDL',
+    'biomarker.LDL Cholesterol': 'Colesterol LDL',
+    'biomarker.VLDL': 'VLDL',
+    'biomarker.Total Cholesterol': 'Colesterol total',
+    'biomarker.Cholesterol': 'Colesterol',
+    'biomarker.Triglycerides': 'Triglicerídeos',
+    'biomarker.Non-HDL Cholesterol': 'Colesterol não-HDL',
+    'biomarker.Glucose': 'Glicose',
+    'biomarker.Fasting Glucose': 'Glicemia em jejum',
+    'biomarker.HbA1c': 'Hemoglobina glicada (HbA1c)',
+    'biomarker.Hemoglobin A1c': 'Hemoglobina glicada',
+    'biomarker.Insulin': 'Insulina',
+    'biomarker.Creatinine': 'Creatinina',
+    'biomarker.BUN': 'Ureia',
+    'biomarker.Blood Urea Nitrogen': 'Ureia',
+    'biomarker.eGFR': 'TFG estimada',
+    'biomarker.Uric Acid': 'Ácido úrico',
+    'biomarker.Sodium': 'Sódio',
+    'biomarker.Potassium': 'Potássio',
+    'biomarker.Calcium': 'Cálcio',
+    'biomarker.Phosphorus': 'Fósforo',
+    'biomarker.Bicarbonate': 'Bicarbonato',
+    'biomarker.Chloride': 'Cloro',
+    'biomarker.Hemoglobin': 'Hemoglobina',
+    'biomarker.Hematocrit': 'Hematócrito',
+    'biomarker.RBC': 'Hemácias',
+    'biomarker.Red Blood Cells': 'Hemácias',
+    'biomarker.WBC': 'Leucócitos',
+    'biomarker.White Blood Cells': 'Leucócitos',
+    'biomarker.Platelets': 'Plaquetas',
+    'biomarker.MCV': 'VCM',
+    'biomarker.MCH': 'HCM',
+    'biomarker.MCHC': 'CHCM',
+    'biomarker.Neutrophils': 'Neutrófilos',
+    'biomarker.Lymphocytes': 'Linfócitos',
+    'biomarker.Monocytes': 'Monócitos',
+    'biomarker.Eosinophils': 'Eosinófilos',
+    'biomarker.Basophils': 'Basófilos',
+    'biomarker.ALT': 'ALT (TGP)',
+    'biomarker.AST': 'AST (TGO)',
+    'biomarker.ALP': 'Fosfatase alcalina',
+    'biomarker.GGT': 'Gama-GT',
+    'biomarker.Total Bilirubin': 'Bilirrubina total',
+    'biomarker.Direct Bilirubin': 'Bilirrubina direta',
+    'biomarker.Indirect Bilirubin': 'Bilirrubina indireta',
+    'biomarker.Albumin': 'Albumina',
+    'biomarker.Total Protein': 'Proteínas totais',
+    'biomarker.TSH': 'TSH',
+    'biomarker.T3': 'T3',
+    'biomarker.T4': 'T4',
+    'biomarker.Free T3': 'T3 livre',
+    'biomarker.Free T4': 'T4 livre',
+    'biomarker.fT3': 'T3 livre',
+    'biomarker.fT4': 'T4 livre',
+    'biomarker.Vitamin D': 'Vitamina D',
+    'biomarker.25-OH Vitamin D': '25-OH Vitamina D',
+    'biomarker.Vitamin B12': 'Vitamina B12',
+    'biomarker.Folate': 'Folato',
+    'biomarker.Folic Acid': 'Ácido fólico',
+    'biomarker.Iron': 'Ferro',
+    'biomarker.Ferritin': 'Ferritina',
+    'biomarker.TIBC': 'Capacidade total de ligação do ferro (CTLF)',
+    'biomarker.Transferrin Saturation': 'Saturação da transferrina',
+    'biomarker.Zinc': 'Zinco',
+    'biomarker.Magnesium': 'Magnésio',
+    'biomarker.Selenium': 'Selênio',
+    'biomarker.CRP': 'PCR',
+    'biomarker.C-Reactive Protein': 'Proteína C-reativa',
+    'biomarker.hs-CRP': 'PCR ultrassensível',
+    'biomarker.ESR': 'VHS',
+    'biomarker.Homocysteine': 'Homocisteína',
+    'biomarker.Fibrinogen': 'Fibrinogênio',
+    'biomarker.Testosterone': 'Testosterona',
+    'biomarker.Free Testosterone': 'Testosterona livre',
+    'biomarker.Estradiol': 'Estradiol',
+    'biomarker.Progesterone': 'Progesterona',
+    'biomarker.Cortisol': 'Cortisol',
+    'biomarker.DHEA': 'DHEA',
+    'biomarker.DHEA-S': 'DHEA-S',
+    'biomarker.Prolactin': 'Prolactina',
+    'biomarker.LH': 'LH',
+    'biomarker.FSH': 'FSH',
+
     // Sidebar
     'nav.dashboard': 'Painel',
     'nav.upload': 'Enviar relatório',
@@ -411,6 +497,7 @@ interface I18nContextValue {
   lang: Language
   setLang: (l: Language) => void
   t: (key: string, vars?: Record<string, string | number>) => string
+  tBiomarker: (name: string) => string
   locale: string
   formatDate: (dateStr: string) => string
   formatDateShort: (dateStr: string) => string
@@ -447,6 +534,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       const raw = dict[key] ?? dictionaries.en[key] ?? key
       return interpolate(raw, vars)
     }
+    const tBiomarker = (name: string) => dict[`biomarker.${name}`] ?? name
     const toDate = (dateStr: string) =>
       new Date(dateStr.includes('T') ? dateStr : dateStr + 'T00:00:00')
     const formatDate = (dateStr: string) =>
@@ -461,7 +549,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
         day: 'numeric',
         year: '2-digit',
       })
-    return { lang, setLang: setLangState, t, locale, formatDate, formatDateShort }
+    return { lang, setLang: setLangState, t, tBiomarker, locale, formatDate, formatDateShort }
   }, [lang])
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>

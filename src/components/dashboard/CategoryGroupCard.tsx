@@ -39,7 +39,7 @@ function Sparkline({ entries }: { entries: BiomarkerWithDate[] }) {
 }
 
 export function CategoryGroupCard({ category, grouped }: CategoryGroupCardProps) {
-  const { t } = useT()
+  const { t, tBiomarker } = useT()
   const items = Object.entries(grouped)
     .map(([name, entries]) => {
       const sorted = [...entries].sort((a, b) => a.report_date.localeCompare(b.report_date))
@@ -80,7 +80,7 @@ export function CategoryGroupCard({ category, grouped }: CategoryGroupCardProps)
             <div key={name} className="flex items-center gap-3 px-4 py-2.5">
               {/* Name + value */}
               <div className="flex-1 min-w-0">
-                <p className="text-xs text-gray-500 truncate">{name}</p>
+                <p className="text-xs text-gray-500 truncate">{tBiomarker(name)}</p>
                 <div className="flex items-baseline gap-1 mt-0.5">
                   <span className="text-sm font-bold text-gray-900 tabular-nums">
                     {latest.value ?? latest.value_text ?? '—'}

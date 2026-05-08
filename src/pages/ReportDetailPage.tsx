@@ -16,7 +16,7 @@ export function ReportDetailPage() {
   const { user } = useAuth()
   const { reports, fetchReportBiomarkers } = useReports(user?.id)
   const navigate = useNavigate()
-  const { t, formatDate } = useT()
+  const { t, tBiomarker, formatDate } = useT()
 
   const [biomarkers, setBiomarkers] = useState<Biomarker[]>([])
   const [loading, setLoading] = useState(true)
@@ -143,7 +143,7 @@ export function ReportDetailPage() {
                   <tbody className="divide-y divide-gray-50">
                     {items.map(b => (
                       <tr key={b.id} className="hover:bg-gray-50/50">
-                        <td className="px-4 py-2.5 font-medium text-gray-800">{b.name}</td>
+                        <td className="px-4 py-2.5 font-medium text-gray-800">{tBiomarker(b.name)}</td>
                         <td className="px-4 py-2.5 text-right tabular-nums font-semibold text-gray-900">{b.value ?? b.value_text ?? '—'}</td>
                         <td className="px-4 py-2.5 text-gray-500">{b.unit ?? '—'}</td>
                         <td className="px-4 py-2.5 text-gray-500 hidden sm:table-cell">{b.reference_text ?? '—'}</td>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useT } from '@/lib/i18n'
 import type { BiomarkerWithDate } from '@/types'
 
 interface BiomarkerFilters {
@@ -10,14 +11,15 @@ interface BiomarkerFilters {
 }
 
 export function useBiomarkers(userId?: string, filters: BiomarkerFilters = {}) {
-  const [biomarkers, setBiomarkers] = useState<BiomarkerWithDate[]>([])
+  const { tBiomarker } = useT()
+  const [allBiomarkers, setAllBiomarkers] = useState<BiomarkerWithDate[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!userId) return
     fetchBiomarkers()
-  }, [userId, filters.startDate, filters.endDate, filters.category, filters.search])
+  }, [userId, filters.startDate, filters.endDate, filters.category])
 
   async function fetchBiomarkers() {
     setLoading(true)
@@ -37,9 +39,6 @@ export function useBiomarkers(userId?: string, filters: BiomarkerFilters = {}) {
     if (filters.category && filters.category !== 'All') {
       query = query.eq('category', filters.category)
     }
-    if (filters.search) {
-      query = query.ilike('name', `%${filters.search}%`)
-    }
 
     const { data, error } = await query
 
@@ -50,10 +49,21 @@ export function useBiomarkers(userId?: string, filters: BiomarkerFilters = {}) {
         ...b,
         report_date: (b.lab_reports as { report_date: string }).report_date,
       })) as BiomarkerWithDate[]
-      setBiomarkers(enriched)
+      setAllBiomarkers(enriched)
     }
     setLoading(false)
   }
+
+  // Search client-side so it matches both the stored canonical name and its translation
+  const biomarkers = filters.search
+    ? allBiomarkers.filter(b => {
+        const q = filters.search!.toLowerCase()
+        return (
+          b.name.toLowerCase().includes(q) ||
+          tBiomarker(b.name).toLowerCase().includes(q)
+        )
+      })
+    : allBiomarkers
 
   // Group biomarkers by name for charting
   const grouped = biomarkers.reduce<Record<string, BiomarkerWithDate[]>>((acc, b) => {
