@@ -2,7 +2,7 @@ import { TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import type { BiomarkerWithDate } from '@/types'
-import { formatDate } from '@/lib/utils'
+import { useT } from '@/lib/i18n'
 
 interface BiomarkerCardProps {
   name: string
@@ -11,6 +11,7 @@ interface BiomarkerCardProps {
 }
 
 export function BiomarkerCard({ name, entries, onClick }: BiomarkerCardProps) {
+  const { t, formatDate } = useT()
   const sorted = [...entries].sort((a, b) => a.report_date.localeCompare(b.report_date))
   const latest = sorted[sorted.length - 1]
   const previous = sorted[sorted.length - 2]
@@ -43,8 +44,8 @@ export function BiomarkerCard({ name, entries, onClick }: BiomarkerCardProps) {
             </div>
           </div>
           <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-            <Badge variant={statusVariant} className="capitalize">
-              {statusVariant}
+            <Badge variant={statusVariant}>
+              {t(`status.${statusVariant}`)}
             </Badge>
             {trend === 'up' && (
               <TrendingUp className={`h-4 w-4 ${
@@ -65,12 +66,12 @@ export function BiomarkerCard({ name, entries, onClick }: BiomarkerCardProps) {
         <div className="mt-3 flex items-center justify-between text-xs text-gray-400">
           <span>{formatDate(latest.report_date)}</span>
           {latest.reference_text && (
-            <span>Ref: {latest.reference_text}</span>
+            <span>{t('common.ref')}: {latest.reference_text}</span>
           )}
         </div>
 
         {entries.length > 1 && (
-          <div className="mt-2 text-xs text-primary-600">{entries.length} measurements</div>
+          <div className="mt-2 text-xs text-primary-600">{entries.length} {t('common.measurements')}</div>
         )}
       </CardContent>
     </Card>

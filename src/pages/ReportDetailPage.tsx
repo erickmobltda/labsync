@@ -7,14 +7,16 @@ import type { LabReport, Biomarker } from '@/types'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
-import { formatDate, statusBg } from '@/lib/utils'
+import { statusBg } from '@/lib/utils'
 import { getReportPdfUrl } from '@/lib/storage'
+import { useT } from '@/lib/i18n'
 
 export function ReportDetailPage() {
   const { id } = useParams<{ id: string }>()
   const { user } = useAuth()
   const { reports, fetchReportBiomarkers } = useReports(user?.id)
   const navigate = useNavigate()
+  const { t, formatDate } = useT()
 
   const [biomarkers, setBiomarkers] = useState<Biomarker[]>([])
   const [loading, setLoading] = useState(true)
@@ -39,7 +41,7 @@ export function ReportDetailPage() {
         a.remove()
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load PDF')
+      setError(err instanceof Error ? err.message : t('detail.loadPdfFailed'))
     } finally {
       setPdfLoading(null)
     }
@@ -74,10 +76,10 @@ export function ReportDetailPage() {
           </div>
           <div className="min-w-0">
             <h1 className="text-lg font-bold text-gray-900 truncate">
-              {report?.source_filename ?? 'Report Detail'}
+              {report?.source_filename ?? t('detail.title')}
             </h1>
             {report && (
-              <p className="text-xs text-gray-500">Report date: {formatDate(report.report_date)}</p>
+              <p className="text-xs text-gray-500">{t('detail.reportDate', { date: formatDate(report.report_date) })}</p>
             )}
           </div>
         </div>
@@ -90,7 +92,7 @@ export function ReportDetailPage() {
               disabled={pdfLoading !== null}
             >
               {pdfLoading === 'view' ? <Spinner size="sm" /> : <ExternalLink className="h-4 w-4" />}
-              <span className="ml-1.5 hidden sm:inline">View PDF</span>
+              <span className="ml-1.5 hidden sm:inline">{t('detail.viewPdf')}</span>
             </Button>
             <Button
               variant="outline"
@@ -99,7 +101,7 @@ export function ReportDetailPage() {
               disabled={pdfLoading !== null}
             >
               {pdfLoading === 'download' ? <Spinner size="sm" /> : <Download className="h-4 w-4" />}
-              <span className="ml-1.5 hidden sm:inline">Download</span>
+              <span className="ml-1.5 hidden sm:inline">{t('detail.download')}</span>
             </Button>
           </div>
         )}
@@ -115,27 +117,27 @@ export function ReportDetailPage() {
         <div className="space-y-5">
           {/* Summary badges */}
           <div className="flex flex-wrap gap-2">
-            <Badge variant="secondary">{biomarkers.length} biomarkers</Badge>
-            <Badge variant="normal">{biomarkers.filter(b => b.status === 'normal').length} Normal</Badge>
-            <Badge variant="high">{biomarkers.filter(b => b.status === 'high').length} High</Badge>
-            <Badge variant="low">{biomarkers.filter(b => b.status === 'low').length} Low</Badge>
+            <Badge variant="secondary">{t('detail.biomarkersCount', { count: biomarkers.length })}</Badge>
+            <Badge variant="normal">{biomarkers.filter(b => b.status === 'normal').length} {t('common.normal')}</Badge>
+            <Badge variant="high">{biomarkers.filter(b => b.status === 'high').length} {t('common.high')}</Badge>
+            <Badge variant="low">{biomarkers.filter(b => b.status === 'low').length} {t('common.low')}</Badge>
           </div>
 
           {/* Biomarkers by category */}
           {Object.entries(byCategory).map(([category, items]) => (
             <div key={category} className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
               <div className="bg-gray-50 border-b border-gray-100 px-4 py-2.5">
-                <h2 className="text-sm font-semibold text-gray-700">{category}</h2>
+                <h2 className="text-sm font-semibold text-gray-700">{t(`category.${category}`)}</h2>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-gray-50">
-                      <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wide">Biomarker</th>
-                      <th className="px-4 py-2.5 text-right text-xs font-semibold text-gray-400 uppercase tracking-wide">Value</th>
-                      <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wide">Unit</th>
-                      <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wide hidden sm:table-cell">Reference</th>
-                      <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wide">Status</th>
+                      <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wide">{t('common.biomarker')}</th>
+                      <th className="px-4 py-2.5 text-right text-xs font-semibold text-gray-400 uppercase tracking-wide">{t('common.value')}</th>
+                      <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wide">{t('common.unit')}</th>
+                      <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wide hidden sm:table-cell">{t('common.reference')}</th>
+                      <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wide">{t('common.status')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
@@ -147,7 +149,7 @@ export function ReportDetailPage() {
                         <td className="px-4 py-2.5 text-gray-500 hidden sm:table-cell">{b.reference_text ?? '—'}</td>
                         <td className="px-4 py-2.5">
                           <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${statusBg(b.status as 'normal' | 'high' | 'low' | 'unknown')}`}>
-                            {b.status}
+                            {t(`status.${b.status}`)}
                           </span>
                         </td>
                       </tr>

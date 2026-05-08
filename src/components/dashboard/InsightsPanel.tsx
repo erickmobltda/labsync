@@ -1,5 +1,6 @@
 import { TrendingUp, TrendingDown, Minus, CheckCircle2, AlertTriangle, AlertCircle } from 'lucide-react'
 import type { BiomarkerWithDate } from '@/types'
+import { useT } from '@/lib/i18n'
 
 interface InsightsPanelProps {
   grouped: Record<string, BiomarkerWithDate[]>
@@ -26,6 +27,7 @@ function trendIsImproving(status: string, trend: string) {
 }
 
 export function InsightsPanel({ grouped, onSelectBiomarker }: InsightsPanelProps) {
+  const { t } = useT()
   const entries = Object.entries(grouped).map(([name, data]) => ({
     name,
     latest: getLatest(data),
@@ -47,7 +49,7 @@ export function InsightsPanel({ grouped, onSelectBiomarker }: InsightsPanelProps
           <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />
           <div>
             <span className="text-2xl font-bold text-green-600">{normal.length}</span>
-            <span className="text-sm text-gray-500 ml-1">Normal</span>
+            <span className="text-sm text-gray-500 ml-1">{t('common.normal')}</span>
           </div>
         </div>
 
@@ -56,7 +58,7 @@ export function InsightsPanel({ grouped, onSelectBiomarker }: InsightsPanelProps
             <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
             <div>
               <span className="text-2xl font-bold text-red-600">{high.length}</span>
-              <span className="text-sm text-gray-500 ml-1">High</span>
+              <span className="text-sm text-gray-500 ml-1">{t('common.high')}</span>
             </div>
           </div>
         )}
@@ -66,13 +68,13 @@ export function InsightsPanel({ grouped, onSelectBiomarker }: InsightsPanelProps
             <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0" />
             <div>
               <span className="text-2xl font-bold text-amber-600">{low.length}</span>
-              <span className="text-sm text-gray-500 ml-1">Low</span>
+              <span className="text-sm text-gray-500 ml-1">{t('common.low')}</span>
             </div>
           </div>
         )}
 
         {unknown.length > 0 && (
-          <div className="ml-auto text-sm text-gray-400">{unknown.length} without reference range</div>
+          <div className="ml-auto text-sm text-gray-400">{t('insights.withoutRef', { count: unknown.length })}</div>
         )}
 
         {/* Progress bar */}
@@ -83,7 +85,7 @@ export function InsightsPanel({ grouped, onSelectBiomarker }: InsightsPanelProps
               <div className="h-full bg-red-400" style={{ width: `${(high.length / total) * 100}%` }} />
               <div className="h-full bg-amber-400" style={{ width: `${(low.length / total) * 100}%` }} />
             </div>
-            <span className="text-xs text-gray-400 whitespace-nowrap">{total} total</span>
+            <span className="text-xs text-gray-400 whitespace-nowrap">{t('insights.total', { count: total })}</span>
           </div>
         )}
       </div>
@@ -92,7 +94,7 @@ export function InsightsPanel({ grouped, onSelectBiomarker }: InsightsPanelProps
       {needsAttention.length > 0 && (
         <div>
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
-            Needs Attention
+            {t('insights.needsAttention')}
           </p>
           <div className="flex gap-2 overflow-x-auto pb-1">
             {needsAttention.map(({ name, latest, trend }) => {
@@ -117,8 +119,8 @@ export function InsightsPanel({ grouped, onSelectBiomarker }: InsightsPanelProps
                     {latest.unit && <span className="text-xs text-gray-400">{latest.unit}</span>}
                   </div>
                   <div className="mt-1 flex items-center gap-1">
-                    <span className={`text-xs font-medium capitalize ${isHigh ? 'text-red-500' : 'text-amber-500'}`}>
-                      {latest.status}
+                    <span className={`text-xs font-medium ${isHigh ? 'text-red-500' : 'text-amber-500'}`}>
+                      {t(`status.${latest.status}`)}
                     </span>
                     {trend === 'up' && (
                       <TrendingUp className={`h-3 w-3 ${improving === true ? 'text-green-500' : improving === false ? 'text-red-500' : 'text-gray-400'}`} />
@@ -127,8 +129,8 @@ export function InsightsPanel({ grouped, onSelectBiomarker }: InsightsPanelProps
                       <TrendingDown className={`h-3 w-3 ${improving === true ? 'text-green-500' : improving === false ? 'text-red-500' : 'text-gray-400'}`} />
                     )}
                     {trend === 'flat' && <Minus className="h-3 w-3 text-gray-300" />}
-                    {improving === true && <span className="text-xs text-green-600">Improving</span>}
-                    {improving === false && <span className="text-xs text-red-600">Worsening</span>}
+                    {improving === true && <span className="text-xs text-green-600">{t('common.improving')}</span>}
+                    {improving === false && <span className="text-xs text-red-600">{t('common.worsening')}</span>}
                   </div>
                 </button>
               )
@@ -139,7 +141,7 @@ export function InsightsPanel({ grouped, onSelectBiomarker }: InsightsPanelProps
 
       {needsAttention.length === 0 && total > 0 && (
         <p className="text-sm text-green-600 font-medium">
-          All biomarkers with reference ranges are within normal limits.
+          {t('insights.allNormal')}
         </p>
       )}
     </div>

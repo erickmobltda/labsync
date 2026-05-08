@@ -3,9 +3,9 @@ import {
   ReferenceLine, ResponsiveContainer, Dot,
 } from 'recharts'
 import type { BiomarkerWithDate } from '@/types'
-import { formatDateShort } from '@/lib/utils'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { useT } from '@/lib/i18n'
 
 interface BiomarkerChartProps {
   name: string
@@ -20,6 +20,7 @@ const STATUS_COLOR: Record<string, string> = {
 }
 
 export function BiomarkerChart({ name, entries }: BiomarkerChartProps) {
+  const { t, formatDateShort } = useT()
   const sorted = [...entries].sort((a, b) => a.report_date.localeCompare(b.report_date))
   const latest = sorted[sorted.length - 1]
   const unit = latest?.unit ?? ''
@@ -48,8 +49,8 @@ export function BiomarkerChart({ name, entries }: BiomarkerChartProps) {
           <CardTitle className="text-sm">{name}</CardTitle>
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-400">{unit}</span>
-            <Badge variant={statusVariant} className="capitalize text-xs">
-              {latest?.value ?? '—'} {statusVariant !== 'unknown' ? `(${statusVariant})` : ''}
+            <Badge variant={statusVariant} className="text-xs">
+              {latest?.value ?? '—'} {statusVariant !== 'unknown' ? `(${t(`status.${statusVariant}`)})` : ''}
             </Badge>
           </div>
         </div>
@@ -57,7 +58,7 @@ export function BiomarkerChart({ name, entries }: BiomarkerChartProps) {
       <CardContent className="pb-3">
         {data.length < 2 ? (
           <div className="flex h-24 items-center justify-center text-xs text-gray-400">
-            Only one measurement — upload more reports to see trends
+            {t('chart.onlyOne')}
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={140}>
@@ -71,10 +72,10 @@ export function BiomarkerChart({ name, entries }: BiomarkerChartProps) {
                 labelStyle={{ color: '#64748B', marginBottom: 2 }}
               />
               {refMin != null && (
-                <ReferenceLine y={refMin} stroke="#FCD34D" strokeDasharray="4 4" label={{ value: 'Min', fontSize: 9, fill: '#D97706' }} />
+                <ReferenceLine y={refMin} stroke="#FCD34D" strokeDasharray="4 4" label={{ value: t('common.min'), fontSize: 9, fill: '#D97706' }} />
               )}
               {refMax != null && (
-                <ReferenceLine y={refMax} stroke="#FCA5A5" strokeDasharray="4 4" label={{ value: 'Max', fontSize: 9, fill: '#DC2626' }} />
+                <ReferenceLine y={refMax} stroke="#FCA5A5" strokeDasharray="4 4" label={{ value: t('common.max'), fontSize: 9, fill: '#DC2626' }} />
               )}
               <Line
                 type="monotone"

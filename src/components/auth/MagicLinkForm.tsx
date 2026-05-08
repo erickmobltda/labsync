@@ -4,9 +4,11 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/hooks/useAuth'
+import { useT } from '@/lib/i18n'
 
 export function MagicLinkForm() {
   const { signInWithMagicLink } = useAuth()
+  const { t } = useT()
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
@@ -21,7 +23,7 @@ export function MagicLinkForm() {
       await signInWithMagicLink(email)
       setSent(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send link')
+      setError(err instanceof Error ? err.message : t('magic.failed'))
     } finally {
       setLoading(false)
     }
@@ -34,17 +36,16 @@ export function MagicLinkForm() {
           <CheckCircle className="h-7 w-7 text-green-600" />
         </div>
         <div>
-          <h3 className="font-semibold text-gray-900">Check your email</h3>
+          <h3 className="font-semibold text-gray-900">{t('magic.sentTitle')}</h3>
           <p className="mt-1 text-sm text-gray-500">
-            We sent a magic link to <span className="font-medium text-gray-700">{email}</span>.
-            Click the link to sign in.
+            {t('magic.sentBody', { email })}
           </p>
         </div>
         <button
           className="text-sm text-primary-600 hover:underline"
           onClick={() => { setSent(false); setEmail('') }}
         >
-          Use a different email
+          {t('magic.useDifferent')}
         </button>
       </div>
     )
@@ -53,13 +54,13 @@ export function MagicLinkForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div className="space-y-1.5">
-        <Label htmlFor="email">Email address</Label>
+        <Label htmlFor="email">{t('magic.emailLabel')}</Label>
         <div className="relative">
           <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
           <Input
             id="email"
             type="email"
-            placeholder="you@example.com"
+            placeholder={t('magic.placeholder')}
             value={email}
             onChange={e => setEmail(e.target.value)}
             className="pl-9"
@@ -77,10 +78,10 @@ export function MagicLinkForm() {
 
       <Button type="submit" disabled={loading || !email} className="w-full">
         {loading ? (
-          'Sending...'
+          t('magic.sending')
         ) : (
           <>
-            Send Magic Link
+            {t('magic.send')}
             <ArrowRight className="h-4 w-4" />
           </>
         )}
