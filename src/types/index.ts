@@ -19,7 +19,8 @@ export interface Biomarker {
   report_id: string
   user_id: string
   name: string
-  value: number
+  value: number | null
+  value_text: string | null
   unit: string | null
   reference_min: number | null
   reference_max: number | null
@@ -31,7 +32,8 @@ export interface Biomarker {
 
 export interface ExtractedBiomarker {
   name: string
-  value: number
+  value: number | null
+  value_text?: string | null
   unit: string
   reference_text: string
   reference_min: number | null

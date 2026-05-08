@@ -71,7 +71,7 @@ export function ExtractionPreview({ extracted, onDateChange, onConfirm, onReset,
               {extracted.biomarkers.map((b, i) => (
                 <tr key={i} className="hover:bg-gray-50/50 transition-colors">
                   <td className="px-4 py-2.5 font-medium text-gray-800">{b.name}</td>
-                  <td className="px-4 py-2.5 text-right tabular-nums font-semibold text-gray-900">{b.value}</td>
+                  <td className="px-4 py-2.5 text-right tabular-nums font-semibold text-gray-900">{b.value ?? b.value_text ?? '—'}</td>
                   <td className="px-4 py-2.5 text-gray-500 hidden sm:table-cell">{b.unit}</td>
                   <td className="px-4 py-2.5 text-gray-500 hidden md:table-cell">{b.reference_text || '—'}</td>
                   <td className="px-4 py-2.5">

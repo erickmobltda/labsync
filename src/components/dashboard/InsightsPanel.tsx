@@ -15,7 +15,7 @@ function getTrend(entries: BiomarkerWithDate[]) {
   const sorted = [...entries].sort((a, b) => a.report_date.localeCompare(b.report_date))
   const latest = sorted.at(-1)!
   const previous = sorted.at(-2)
-  if (!previous || latest.value === previous.value) return 'flat'
+  if (!previous || latest.value == null || previous.value == null || latest.value === previous.value) return 'flat'
   return latest.value > previous.value ? 'up' : 'down'
 }
 

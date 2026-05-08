@@ -9,7 +9,9 @@ interface CategoryGroupCardProps {
 }
 
 function Sparkline({ entries }: { entries: BiomarkerWithDate[] }) {
-  const sorted = [...entries].sort((a, b) => a.report_date.localeCompare(b.report_date))
+  const sorted = [...entries]
+    .filter(e => e.value != null)
+    .sort((a, b) => a.report_date.localeCompare(b.report_date))
   if (sorted.length < 2) {
     return <div className="w-16 h-8 flex items-center justify-center text-xs text-gray-300">—</div>
   }
@@ -81,7 +83,7 @@ export function CategoryGroupCard({ category, grouped }: CategoryGroupCardProps)
                 <p className="text-xs text-gray-500 truncate">{name}</p>
                 <div className="flex items-baseline gap-1 mt-0.5">
                   <span className="text-sm font-bold text-gray-900 tabular-nums">
-                    {latest.value}
+                    {latest.value ?? latest.value_text ?? '—'}
                   </span>
                   {latest.unit && (
                     <span className="text-xs text-gray-400">{latest.unit}</span>

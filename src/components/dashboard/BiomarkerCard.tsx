@@ -17,13 +17,14 @@ export function BiomarkerCard({ name, entries, onClick }: BiomarkerCardProps) {
   const previous = sorted[sorted.length - 2]
 
   const trend =
-    previous && latest.value !== previous.value
+    previous && latest.value != null && previous.value != null && latest.value !== previous.value
       ? latest.value > previous.value
         ? 'up'
         : 'down'
       : 'flat'
 
   const statusVariant = (latest.status ?? 'unknown') as 'normal' | 'high' | 'low' | 'unknown'
+  const displayValue = latest.value ?? latest.value_text ?? '—'
 
   return (
     <Card
@@ -36,7 +37,7 @@ export function BiomarkerCard({ name, entries, onClick }: BiomarkerCardProps) {
             <p className="text-xs font-medium text-gray-500 truncate">{name}</p>
             <div className="mt-1 flex items-baseline gap-1.5">
               <span className="text-2xl font-bold text-gray-900 tabular-nums">
-                {latest.value}
+                {displayValue}
               </span>
               {latest.unit && (
                 <span className="text-xs text-gray-400">{latest.unit}</span>
