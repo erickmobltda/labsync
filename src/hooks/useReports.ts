@@ -65,7 +65,8 @@ export function useReports(userId?: string) {
       report_id: report.id,
       user_id: user.id,
       name: b.name,
-      value: b.value,
+      value: b.value ?? null,
+      value_text: b.value_text ?? null,
       unit: b.unit || null,
       reference_min: b.reference_min ?? null,
       reference_max: b.reference_max ?? null,
@@ -75,7 +76,14 @@ export function useReports(userId?: string) {
     }))
 
     const { error: bioError } = await supabase.from('biomarkers').insert(biomarkers)
-    if (bioError) throw bioError
+    if (bioError) {
+      // Roll back the lab_reports row and uploaded PDF so we don't leave orphans
+      await supabase.from('lab_reports').delete().eq('id', report.id)
+      if (storagePath) {
+        await deleteReportPdf(storagePath).catch(() => {})
+      }
+      throw bioError
+    }
 
     await fetchReports()
     return report.id

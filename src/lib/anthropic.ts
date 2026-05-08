@@ -23,7 +23,14 @@ export async function extractBiomarkers(rawText: string): Promise<ExtractedRepor
     const status = computeStatus(b.value, ref_min, ref_max)
     const category = resolveCategory(b.name)
 
-    return { ...b, reference_min: ref_min, reference_max: ref_max, status, category }
+    return {
+      ...b,
+      value_text: b.value_text ?? null,
+      reference_min: ref_min,
+      reference_max: ref_max,
+      status,
+      category,
+    }
   })
 
   return { ...parsed, biomarkers: enriched }

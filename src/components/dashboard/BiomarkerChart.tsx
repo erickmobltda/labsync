@@ -27,11 +27,13 @@ export function BiomarkerChart({ name, entries }: BiomarkerChartProps) {
   const refMin = latest?.reference_min
   const refMax = latest?.reference_max
 
-  const data = sorted.map(e => ({
-    date: formatDateShort(e.report_date),
-    value: e.value,
-    status: e.status,
-  }))
+  const data = sorted
+    .filter(e => e.value != null)
+    .map(e => ({
+      date: formatDateShort(e.report_date),
+      value: e.value,
+      status: e.status,
+    }))
 
   const statusVariant = (latest?.status ?? 'unknown') as 'normal' | 'high' | 'low' | 'unknown'
 
@@ -50,7 +52,7 @@ export function BiomarkerChart({ name, entries }: BiomarkerChartProps) {
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-400">{unit}</span>
             <Badge variant={statusVariant} className="text-xs">
-              {latest?.value ?? '—'} {statusVariant !== 'unknown' ? `(${t(`status.${statusVariant}`)})` : ''}
+              {latest?.value ?? latest?.value_text ?? '—'} {statusVariant !== 'unknown' ? `(${t(`status.${statusVariant}`)})` : ''}
             </Badge>
           </div>
         </div>

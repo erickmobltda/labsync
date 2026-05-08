@@ -33,10 +33,11 @@ export function formatDateShort(dateStr: string): string {
 }
 
 export function computeStatus(
-  value: number,
+  value: number | null | undefined,
   min?: number | null,
   max?: number | null
 ): BiomarkerStatus {
+  if (value == null) return 'unknown'
   if (min == null && max == null) return 'unknown'
   if (max != null && value > max) return 'high'
   if (min != null && value < min) return 'low'
