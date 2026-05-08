@@ -16,7 +16,7 @@ interface ExtractionPreviewProps {
 }
 
 export function ExtractionPreview({ extracted, onDateChange, onConfirm, onReset, saving }: ExtractionPreviewProps) {
-  const { t } = useT()
+  const { t, tBiomarker } = useT()
   const normalCount = extracted.biomarkers.filter(b => b.status === 'normal').length
   const highCount = extracted.biomarkers.filter(b => b.status === 'high').length
   const lowCount = extracted.biomarkers.filter(b => b.status === 'low').length
@@ -70,7 +70,7 @@ export function ExtractionPreview({ extracted, onDateChange, onConfirm, onReset,
             <tbody className="divide-y divide-gray-50">
               {extracted.biomarkers.map((b, i) => (
                 <tr key={i} className="hover:bg-gray-50/50 transition-colors">
-                  <td className="px-4 py-2.5 font-medium text-gray-800">{b.name}</td>
+                  <td className="px-4 py-2.5 font-medium text-gray-800">{tBiomarker(b.name)}</td>
                   <td className="px-4 py-2.5 text-right tabular-nums font-semibold text-gray-900">{b.value ?? b.value_text ?? '—'}</td>
                   <td className="px-4 py-2.5 text-gray-500 hidden sm:table-cell">{b.unit}</td>
                   <td className="px-4 py-2.5 text-gray-500 hidden md:table-cell">{b.reference_text || '—'}</td>

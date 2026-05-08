@@ -11,7 +11,7 @@ interface BiomarkerCardProps {
 }
 
 export function BiomarkerCard({ name, entries, onClick }: BiomarkerCardProps) {
-  const { t, formatDate } = useT()
+  const { t, tBiomarker, formatDate } = useT()
   const sorted = [...entries].sort((a, b) => a.report_date.localeCompare(b.report_date))
   const latest = sorted[sorted.length - 1]
   const previous = sorted[sorted.length - 2]
@@ -34,7 +34,7 @@ export function BiomarkerCard({ name, entries, onClick }: BiomarkerCardProps) {
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <p className="text-xs font-medium text-gray-500 truncate">{name}</p>
+            <p className="text-xs font-medium text-gray-500 truncate">{tBiomarker(name)}</p>
             <div className="mt-1 flex items-baseline gap-1.5">
               <span className="text-2xl font-bold text-gray-900 tabular-nums">
                 {displayValue}
