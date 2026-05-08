@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, FileText } from 'lucide-react'
+import { ArrowLeft, Download, ExternalLink, FileText } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useReports } from '@/hooks/useReports'
 import type { LabReport, Biomarker } from '@/types'
@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { formatDate, statusBg } from '@/lib/utils'
+import { getReportPdfUrl } from '@/lib/storage'
 
 export function ReportDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -18,8 +19,31 @@ export function ReportDetailPage() {
   const [biomarkers, setBiomarkers] = useState<Biomarker[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [pdfLoading, setPdfLoading] = useState<'view' | 'download' | null>(null)
 
   const report: LabReport | undefined = reports.find(r => r.id === id)
+
+  async function openPdf(mode: 'view' | 'download') {
+    if (!report?.storage_path) return
+    setPdfLoading(mode)
+    try {
+      const url = await getReportPdfUrl(report.storage_path)
+      if (mode === 'view') {
+        window.open(url, '_blank', 'noopener,noreferrer')
+      } else {
+        const a = document.createElement('a')
+        a.href = url
+        a.download = report.source_filename ?? 'report.pdf'
+        document.body.appendChild(a)
+        a.click()
+        a.remove()
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load PDF')
+    } finally {
+      setPdfLoading(null)
+    }
+  }
 
   useEffect(() => {
     if (!id || !user) return
@@ -40,16 +64,16 @@ export function ReportDetailPage() {
   return (
     <div className="p-4 lg:p-6 max-w-4xl mx-auto">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-start gap-3 mb-6">
         <Button variant="ghost" size="icon" onClick={() => navigate('/reports')}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-50">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-50 shrink-0">
             <FileText className="h-5 w-5 text-primary-600" />
           </div>
-          <div>
-            <h1 className="text-lg font-bold text-gray-900">
+          <div className="min-w-0">
+            <h1 className="text-lg font-bold text-gray-900 truncate">
               {report?.source_filename ?? 'Report Detail'}
             </h1>
             {report && (
@@ -57,6 +81,28 @@ export function ReportDetailPage() {
             )}
           </div>
         </div>
+        {report?.storage_path && (
+          <div className="flex gap-2 shrink-0">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => openPdf('view')}
+              disabled={pdfLoading !== null}
+            >
+              {pdfLoading === 'view' ? <Spinner size="sm" /> : <ExternalLink className="h-4 w-4" />}
+              <span className="ml-1.5 hidden sm:inline">View PDF</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => openPdf('download')}
+              disabled={pdfLoading !== null}
+            >
+              {pdfLoading === 'download' ? <Spinner size="sm" /> : <Download className="h-4 w-4" />}
+              <span className="ml-1.5 hidden sm:inline">Download</span>
+            </Button>
+          </div>
+        )}
       </div>
 
       {loading ? (

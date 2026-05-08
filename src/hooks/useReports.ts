@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase'
 import type { LabReport, ExtractedReport, Biomarker } from '@/types'
 import { resolveCategory } from '@/lib/categories'
 import { computeStatus } from '@/lib/utils'
+import { uploadReportPdf, deleteReportPdf } from '@/lib/storage'
 
 export function useReports(userId?: string) {
   const [reports, setReports] = useState<LabReport[]>([])
@@ -28,10 +29,16 @@ export function useReports(userId?: string) {
   async function saveReport(
     extracted: ExtractedReport,
     filename: string | null,
-    rawText: string
+    rawText: string,
+    file: File | null = null
   ): Promise<string> {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Not authenticated')
+
+    let storagePath: string | null = null
+    if (file) {
+      storagePath = await uploadReportPdf(file, user.id)
+    }
 
     // Insert report
     const { data: report, error: reportError } = await supabase
@@ -41,11 +48,17 @@ export function useReports(userId?: string) {
         report_date: extracted.report_date,
         source_filename: filename,
         raw_text: rawText,
+        storage_path: storagePath,
       })
       .select()
       .single()
 
-    if (reportError) throw reportError
+    if (reportError) {
+      if (storagePath) {
+        await deleteReportPdf(storagePath).catch(() => {})
+      }
+      throw reportError
+    }
 
     // Insert biomarkers
     const biomarkers = extracted.biomarkers.map(b => ({
@@ -69,8 +82,12 @@ export function useReports(userId?: string) {
   }
 
   async function deleteReport(id: string) {
+    const target = reports.find(r => r.id === id)
     const { error } = await supabase.from('lab_reports').delete().eq('id', id)
     if (error) throw error
+    if (target?.storage_path) {
+      await deleteReportPdf(target.storage_path).catch(() => {})
+    }
     setReports(prev => prev.filter(r => r.id !== id))
   }
 

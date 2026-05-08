@@ -21,6 +21,7 @@ export function UploadPage() {
   const [step, setStep] = useState<Step>('upload')
   const [extracted, setExtracted] = useState<ExtractedReport | null>(null)
   const [sourceFilename, setSourceFilename] = useState<string | null>(null)
+  const [sourceFile, setSourceFile] = useState<File | null>(null)
   const [rawText, setRawText] = useState('')
   const [error, setError] = useState<string | null>(null)
 
@@ -28,6 +29,7 @@ export function UploadPage() {
     setError(null)
     setStep('extracting')
     setSourceFilename(file.name)
+    setSourceFile(file)
     try {
       const text = await pdfToText(file)
       setRawText(text)
@@ -45,6 +47,7 @@ export function UploadPage() {
     setStep('extracting')
     setRawText(text)
     setSourceFilename(null)
+    setSourceFile(null)
     try {
       const result = await extractBiomarkers(text)
       setExtracted(result)
@@ -59,7 +62,7 @@ export function UploadPage() {
     if (!extracted) return
     setStep('saving')
     try {
-      await saveReport(extracted, sourceFilename, rawText)
+      await saveReport(extracted, sourceFilename, rawText, sourceFile)
       toast('Report saved successfully!', 'success')
       setTimeout(() => navigate('/dashboard'), 1000)
     } catch (err) {
@@ -73,6 +76,7 @@ export function UploadPage() {
     setStep('upload')
     setExtracted(null)
     setSourceFilename(null)
+    setSourceFile(null)
     setRawText('')
     setError(null)
   }
