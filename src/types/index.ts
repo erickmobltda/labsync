@@ -10,6 +10,7 @@ export interface LabReport {
   report_date: string
   source_filename: string | null
   raw_text: string | null
+  storage_path: string | null
   created_at: string
 }
 
