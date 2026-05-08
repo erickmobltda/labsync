@@ -49,3 +49,33 @@ export interface BiomarkerWithDate extends Biomarker {
 }
 
 export type BiomarkerStatus = 'normal' | 'high' | 'low' | 'unknown'
+
+export type AppointmentType = 'doctor' | 'exam' | 'therapy'
+
+export interface Appointment {
+  id: string
+  user_id: string
+  type: AppointmentType
+  specialty: string
+  date: string
+  time: string | null
+  notes: string | null
+  created_at: string
+}
+
+export interface Medicine {
+  id: string
+  user_id: string
+  name: string
+  start_date: string
+  end_date: string | null
+  pills_per_dose: number
+  times_per_day: number
+  prescription_required: boolean
+  bought_on: string | null
+  pills_bought: number | null
+  notes: string | null
+  created_at: string
+}
+
+export type MedicineStatus = 'active' | 'upcoming' | 'past'

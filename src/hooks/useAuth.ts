@@ -32,9 +32,33 @@ export function useAuth() {
     if (error) throw error
   }
 
+  async function signInWithPassword(email: string, password: string) {
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) throw error
+  }
+
+  async function signUpWithPassword(email: string, password: string) {
+    const redirectTo = `${window.location.origin}/labsync/`
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo: redirectTo },
+    })
+    if (error) throw error
+    return { needsConfirmation: !data.session }
+  }
+
   async function signOut() {
     await supabase.auth.signOut()
   }
 
-  return { session, user, loading, signInWithMagicLink, signOut }
+  return {
+    session,
+    user,
+    loading,
+    signInWithMagicLink,
+    signInWithPassword,
+    signUpWithPassword,
+    signOut,
+  }
 }
