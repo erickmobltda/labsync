@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { ToastContainer, useToast } from '@/components/ui/toast'
 import { cn, formatDate, todayISO } from '@/lib/utils'
-import { TYPE_LABEL, formatTime, typeBadgeClasses } from '@/lib/appointments'
+import { formatTime, typeBadgeClasses } from '@/lib/appointments'
+import { useT } from '@/lib/i18n'
 import type { Appointment } from '@/types'
 
 type Tab = 'upcoming' | 'past'
@@ -17,6 +18,7 @@ export function AppointmentsPage() {
   const { appointments, loading, error, deleteAppointment } = useAppointments(user?.id)
   const navigate = useNavigate()
   const { toasts, toast, close } = useToast()
+  const { t } = useT()
   const [tab, setTab] = useState<Tab>('upcoming')
   const [deleting, setDeleting] = useState<string | null>(null)
 
@@ -38,13 +40,13 @@ export function AppointmentsPage() {
 
   async function handleDelete(id: string, e: React.MouseEvent) {
     e.stopPropagation()
-    if (!confirm('Delete this appointment?')) return
+    if (!confirm(t('appt.deleteConfirm'))) return
     setDeleting(id)
     try {
       await deleteAppointment(id)
-      toast('Appointment deleted', 'success')
+      toast(t('appt.deleted'), 'success')
     } catch (err) {
-      toast(err instanceof Error ? err.message : 'Failed to delete', 'error')
+      toast(err instanceof Error ? err.message : t('appt.deleteFailed'), 'error')
     } finally {
       setDeleting(null)
     }
@@ -54,28 +56,30 @@ export function AppointmentsPage() {
     <div className="p-4 lg:p-6 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Appointments</h1>
+          <h1 className="text-xl font-bold text-gray-900">{t('appt.title')}</h1>
           <p className="text-sm text-gray-500 mt-0.5">
-            {upcoming.length} upcoming · {past.length} past
+            {t('appt.summary', { upcoming: upcoming.length, past: past.length })}
           </p>
         </div>
         <Button size="sm" onClick={() => navigate('/appointments/new')}>
           <Plus className="h-4 w-4" />
-          Add Appointment
+          {t('appt.add')}
         </Button>
       </div>
 
       <div className="mb-4 inline-flex rounded-lg border border-gray-200 bg-white p-1 shadow-sm">
-        {(['upcoming', 'past'] as Tab[]).map(t => (
+        {(['upcoming', 'past'] as Tab[]).map(tabKey => (
           <button
-            key={t}
-            onClick={() => setTab(t)}
+            key={tabKey}
+            onClick={() => setTab(tabKey)}
             className={cn(
               'rounded-md px-4 py-1.5 text-sm font-medium transition-colors',
-              tab === t ? 'bg-primary-50 text-primary-700' : 'text-gray-500 hover:text-gray-700'
+              tab === tabKey ? 'bg-primary-50 text-primary-700' : 'text-gray-500 hover:text-gray-700'
             )}
           >
-            {t === 'upcoming' ? `Upcoming (${upcoming.length})` : `Past (${past.length})`}
+            {tabKey === 'upcoming'
+              ? t('appt.tab.upcoming', { count: upcoming.length })
+              : t('appt.tab.past', { count: past.length })}
           </button>
         ))}
       </div>
@@ -92,17 +96,15 @@ export function AppointmentsPage() {
             <Calendar className="h-7 w-7 text-gray-400" />
           </div>
           <h3 className="font-semibold text-gray-700">
-            {tab === 'upcoming' ? 'No upcoming appointments' : 'No past appointments'}
+            {tab === 'upcoming' ? t('appt.empty.upcoming') : t('appt.empty.past')}
           </h3>
           <p className="mt-1.5 text-sm text-gray-500 max-w-xs">
-            {tab === 'upcoming'
-              ? 'Schedule a doctor visit, exam, or therapy session to track it here.'
-              : 'Past appointments will appear here once their date passes.'}
+            {tab === 'upcoming' ? t('appt.emptySub.upcoming') : t('appt.emptySub.past')}
           </p>
           {tab === 'upcoming' && (
             <Button className="mt-5" onClick={() => navigate('/appointments/new')}>
               <Plus className="h-4 w-4" />
-              Add Appointment
+              {t('appt.add')}
             </Button>
           )}
         </div>
@@ -119,9 +121,9 @@ export function AppointmentsPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <p className="font-medium text-gray-900 text-sm">{a.specialty}</p>
+                  <p className="font-medium text-gray-900 text-sm">{t(`specialty.${a.specialty}`)}</p>
                   <span className={cn('inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium', typeBadgeClasses(a.type))}>
-                    {TYPE_LABEL[a.type]}
+                    {t(`apptType.${a.type}`)}
                   </span>
                 </div>
                 <p className="text-xs text-gray-500 mt-0.5">

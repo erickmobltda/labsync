@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import { Calendar, Pill, ShoppingCart, ChevronRight } from 'lucide-react'
 import type { Appointment, Medicine } from '@/types'
 import { cn, formatDate, todayISO } from '@/lib/utils'
-import { TYPE_LABEL, formatTime, typeBadgeClasses } from '@/lib/appointments'
+import { formatTime, typeBadgeClasses } from '@/lib/appointments'
 import { lastsUntil, pillsPerDay, statusForMedicine } from '@/lib/medicines'
+import { useT } from '@/lib/i18n'
 
 interface HealthSummaryPanelProps {
   appointments: Appointment[]
@@ -29,6 +30,7 @@ function pillsRemaining(m: Medicine, today: string): number | null {
 
 export function HealthSummaryPanel({ appointments, medicines }: HealthSummaryPanelProps) {
   const navigate = useNavigate()
+  const { t } = useT()
   const today = todayISO()
 
   const nextAppointment = useMemo(() => {
@@ -63,28 +65,28 @@ export function HealthSummaryPanel({ appointments, medicines }: HealthSummaryPan
             <Calendar className="h-4 w-4 text-primary-600" />
           </div>
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-            Next Appointment
+            {t('summary.nextAppointment')}
           </p>
           <ChevronRight className="h-4 w-4 text-gray-300 group-hover:text-primary-500 ml-auto" />
         </div>
         {nextAppointment ? (
           <>
             <div className="flex items-center gap-2 flex-wrap">
-              <p className="font-semibold text-gray-900 text-sm">{nextAppointment.specialty}</p>
+              <p className="font-semibold text-gray-900 text-sm">{t(`specialty.${nextAppointment.specialty}`)}</p>
               <span className={cn('inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium', typeBadgeClasses(nextAppointment.type))}>
-                {TYPE_LABEL[nextAppointment.type]}
+                {t(`apptType.${nextAppointment.type}`)}
               </span>
             </div>
             <p className="text-xs text-gray-500 mt-1">
               {formatDate(nextAppointment.date)}
               {nextAppointment.time && ` · ${formatTime(nextAppointment.time)}`}
               {nextAppointment.date === today
-                ? ' · Today'
-                : ` · in ${daysBetween(today, nextAppointment.date)}d`}
+                ? ` · ${t('summary.today')}`
+                : ` · ${t('summary.inDays', { count: daysBetween(today, nextAppointment.date) })}`}
             </p>
           </>
         ) : (
-          <p className="text-sm text-gray-400">No upcoming appointments</p>
+          <p className="text-sm text-gray-400">{t('summary.noUpcoming')}</p>
         )}
       </button>
 
@@ -98,7 +100,7 @@ export function HealthSummaryPanel({ appointments, medicines }: HealthSummaryPan
             <Pill className="h-4 w-4 text-emerald-600" />
           </div>
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-            Active Medicines
+            {t('summary.activeMedicines')}
           </p>
           <ChevronRight className="h-4 w-4 text-gray-300 group-hover:text-primary-500 ml-auto" />
         </div>
@@ -107,11 +109,11 @@ export function HealthSummaryPanel({ appointments, medicines }: HealthSummaryPan
             <p className="text-2xl font-bold text-gray-900 leading-none">{activeMeds.length}</p>
             <p className="text-xs text-gray-500 mt-1.5 line-clamp-2">
               {activeMeds.slice(0, 3).map(m => m.name).join(', ')}
-              {activeMeds.length > 3 && ` +${activeMeds.length - 3} more`}
+              {activeMeds.length > 3 && ` ${t('summary.moreActive', { count: activeMeds.length - 3 })}`}
             </p>
           </>
         ) : (
-          <p className="text-sm text-gray-400">No active medicines</p>
+          <p className="text-sm text-gray-400">{t('summary.noActive')}</p>
         )}
       </button>
 
@@ -136,7 +138,7 @@ export function HealthSummaryPanel({ appointments, medicines }: HealthSummaryPan
             )} />
           </div>
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-            Refill Soon
+            {t('summary.refillSoon')}
           </p>
           <ChevronRight className="h-4 w-4 text-gray-300 group-hover:text-primary-500 ml-auto" />
         </div>
@@ -148,24 +150,24 @@ export function HealthSummaryPanel({ appointments, medicines }: HealthSummaryPan
                 <div key={medicine.id} className="text-xs">
                   <p className="font-medium text-gray-900 truncate">{medicine.name}</p>
                   <p className="text-amber-700">
-                    {remaining != null && `${remaining} pills left · `}
+                    {remaining != null && `${t('summary.pillsLeft', { count: remaining })} · `}
                     {daysLeft <= 0
-                      ? 'Out of supply'
+                      ? t('summary.outOfSupply')
                       : daysLeft === 1
-                      ? 'Buy by tomorrow'
-                      : `Buy by ${formatDate(ends!)}`}
+                      ? t('summary.buyByTomorrow')
+                      : t('summary.buyBy', { date: formatDate(ends!) })}
                   </p>
                 </div>
               )
             })}
             {refillSoon.length > 2 && (
               <p className="text-xs text-amber-600 font-medium">
-                +{refillSoon.length - 2} more need refill
+                {t('summary.moreNeedRefill', { count: refillSoon.length - 2 })}
               </p>
             )}
           </div>
         ) : (
-          <p className="text-sm text-gray-400">All medicines stocked</p>
+          <p className="text-sm text-gray-400">{t('summary.allStocked')}</p>
         )}
       </button>
     </div>

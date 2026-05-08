@@ -8,19 +8,15 @@ import { Spinner } from '@/components/ui/spinner'
 import { ToastContainer, useToast } from '@/components/ui/toast'
 import { cn, formatDate, todayISO } from '@/lib/utils'
 import { lastsUntil, statusBadgeClasses, statusForMedicine } from '@/lib/medicines'
+import { useT } from '@/lib/i18n'
 import type { Medicine, MedicineStatus } from '@/types'
-
-const STATUS_LABEL: Record<MedicineStatus, string> = {
-  active: 'Active',
-  upcoming: 'Upcoming',
-  past: 'Past',
-}
 
 export function MedicinesPage() {
   const { user } = useAuth()
   const { medicines, loading, error, deleteMedicine } = useMedicines(user?.id)
   const navigate = useNavigate()
   const { toasts, toast, close } = useToast()
+  const { t } = useT()
   const [tab, setTab] = useState<MedicineStatus>('active')
   const [deleting, setDeleting] = useState<string | null>(null)
 
@@ -38,13 +34,13 @@ export function MedicinesPage() {
 
   async function handleDelete(id: string, e: React.MouseEvent) {
     e.stopPropagation()
-    if (!confirm('Delete this medicine?')) return
+    if (!confirm(t('med.deleteConfirm'))) return
     setDeleting(id)
     try {
       await deleteMedicine(id)
-      toast('Medicine deleted', 'success')
+      toast(t('med.deleted'), 'success')
     } catch (err) {
-      toast(err instanceof Error ? err.message : 'Failed to delete', 'error')
+      toast(err instanceof Error ? err.message : t('med.deleteFailed'), 'error')
     } finally {
       setDeleting(null)
     }
@@ -54,28 +50,32 @@ export function MedicinesPage() {
     <div className="p-4 lg:p-6 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Medicines</h1>
+          <h1 className="text-xl font-bold text-gray-900">{t('med.title')}</h1>
           <p className="text-sm text-gray-500 mt-0.5">
-            {buckets.active.length} active · {buckets.upcoming.length} upcoming · {buckets.past.length} past
+            {t('med.summary', {
+              active: buckets.active.length,
+              upcoming: buckets.upcoming.length,
+              past: buckets.past.length,
+            })}
           </p>
         </div>
         <Button size="sm" onClick={() => navigate('/medicines/new')}>
           <Plus className="h-4 w-4" />
-          Add Medicine
+          {t('med.add')}
         </Button>
       </div>
 
       <div className="mb-4 inline-flex rounded-lg border border-gray-200 bg-white p-1 shadow-sm">
-        {(['active', 'upcoming', 'past'] as MedicineStatus[]).map(t => (
+        {(['active', 'upcoming', 'past'] as MedicineStatus[]).map(tabKey => (
           <button
-            key={t}
-            onClick={() => setTab(t)}
+            key={tabKey}
+            onClick={() => setTab(tabKey)}
             className={cn(
               'rounded-md px-4 py-1.5 text-sm font-medium transition-colors',
-              tab === t ? 'bg-primary-50 text-primary-700' : 'text-gray-500 hover:text-gray-700'
+              tab === tabKey ? 'bg-primary-50 text-primary-700' : 'text-gray-500 hover:text-gray-700'
             )}
           >
-            {STATUS_LABEL[t]} ({buckets[t].length})
+            {t('med.tab', { label: t(`med.status.${tabKey}`), count: buckets[tabKey].length })}
           </button>
         ))}
       </div>
@@ -91,20 +91,12 @@ export function MedicinesPage() {
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 mb-4">
             <Pill className="h-7 w-7 text-gray-400" />
           </div>
-          <h3 className="font-semibold text-gray-700">
-            {tab === 'active' && 'No active medicines'}
-            {tab === 'upcoming' && 'No upcoming medicines'}
-            {tab === 'past' && 'No past medicines'}
-          </h3>
-          <p className="mt-1.5 text-sm text-gray-500 max-w-xs">
-            {tab === 'active' && 'Add a medicine to track dosing and how long your supply will last.'}
-            {tab === 'upcoming' && 'Medicines with a future start date will show up here.'}
-            {tab === 'past' && 'Medicines that have ended will appear here.'}
-          </p>
+          <h3 className="font-semibold text-gray-700">{t(`med.empty.${tab}`)}</h3>
+          <p className="mt-1.5 text-sm text-gray-500 max-w-xs">{t(`med.emptySub.${tab}`)}</p>
           {tab === 'active' && (
             <Button className="mt-5" onClick={() => navigate('/medicines/new')}>
               <Plus className="h-4 w-4" />
-              Add Medicine
+              {t('med.add')}
             </Button>
           )}
         </div>
@@ -126,21 +118,21 @@ export function MedicinesPage() {
                   <div className="flex items-center gap-2 flex-wrap">
                     <p className="font-medium text-gray-900 text-sm">{m.name}</p>
                     <span className={cn('inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium', statusBadgeClasses(status))}>
-                      {STATUS_LABEL[status]}
+                      {t(`med.statusLabel.${status}`)}
                     </span>
                     {m.prescription_required && (
                       <span className="inline-flex items-center rounded-full border border-rose-200 bg-rose-50 px-2 py-0.5 text-[10px] font-medium text-rose-700">
-                        Rx
+                        {t('med.rx')}
                       </span>
                     )}
                   </div>
                   <p className="text-xs text-gray-500 mt-0.5">
-                    {m.pills_per_dose} × {m.times_per_day}/day · {formatDate(m.start_date)}
-                    {m.end_date ? ` → ${formatDate(m.end_date)}` : ' → ongoing'}
+                    {t('med.dosing', { perDose: m.pills_per_dose, timesPerDay: m.times_per_day })} · {formatDate(m.start_date)}
+                    {m.end_date ? ` → ${formatDate(m.end_date)}` : ` → ${t('med.ongoing')}`}
                   </p>
                   {ends && (
                     <p className="text-xs text-gray-500 mt-0.5">
-                      Supply lasts until <span className="font-medium text-gray-700">{formatDate(ends)}</span>
+                      {t('med.supplyUntil')} <span className="font-medium text-gray-700">{formatDate(ends)}</span>
                     </p>
                   )}
                 </div>
