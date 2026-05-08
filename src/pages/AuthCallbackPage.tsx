@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { Activity, CheckCircle, XCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useT } from '@/lib/i18n'
 
 export function AuthCallbackPage() {
   const navigate = useNavigate()
+  const { t } = useT()
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [errorMsg, setErrorMsg] = useState('')
 
@@ -42,14 +44,14 @@ export function AuthCallbackPage() {
             setTimeout(() => navigate('/dashboard'), 1200)
           }
         } else {
-          setErrorMsg('No session found. The link may have expired.')
+          setErrorMsg(t('authcb.noSession'))
           setStatus('error')
         }
       }
     }
 
     handleCallback()
-  }, [navigate])
+  }, [navigate, t])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-teal-50 flex items-center justify-center p-4">
@@ -61,25 +63,25 @@ export function AuthCallbackPage() {
         {status === 'loading' && (
           <>
             <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-gray-200 border-t-primary-600" />
-            <p className="text-gray-600">Signing you in…</p>
+            <p className="text-gray-600">{t('authcb.signing')}</p>
           </>
         )}
 
         {status === 'success' && (
           <>
             <CheckCircle className="mx-auto mb-3 h-10 w-10 text-green-500" />
-            <h2 className="font-semibold text-gray-900">You're in!</h2>
-            <p className="mt-1 text-sm text-gray-500">Redirecting to your dashboard…</p>
+            <h2 className="font-semibold text-gray-900">{t('authcb.success')}</h2>
+            <p className="mt-1 text-sm text-gray-500">{t('authcb.successSub')}</p>
           </>
         )}
 
         {status === 'error' && (
           <>
             <XCircle className="mx-auto mb-3 h-10 w-10 text-red-500" />
-            <h2 className="font-semibold text-gray-900">Sign-in failed</h2>
+            <h2 className="font-semibold text-gray-900">{t('authcb.failed')}</h2>
             <p className="mt-1 text-sm text-gray-500">{errorMsg}</p>
             <Button className="mt-4" onClick={() => navigate('/login')}>
-              Back to Login
+              {t('authcb.backToLogin')}
             </Button>
           </>
         )}

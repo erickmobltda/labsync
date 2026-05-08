@@ -1,6 +1,7 @@
 import { LineChart, Line, ResponsiveContainer, ReferenceLine } from 'recharts'
 import { Badge } from '@/components/ui/badge'
 import type { BiomarkerWithDate } from '@/types'
+import { useT } from '@/lib/i18n'
 
 interface CategoryGroupCardProps {
   category: string
@@ -36,6 +37,7 @@ function Sparkline({ entries }: { entries: BiomarkerWithDate[] }) {
 }
 
 export function CategoryGroupCard({ category, grouped }: CategoryGroupCardProps) {
+  const { t } = useT()
   const items = Object.entries(grouped)
     .map(([name, entries]) => {
       const sorted = [...entries].sort((a, b) => a.report_date.localeCompare(b.report_date))
@@ -58,12 +60,12 @@ export function CategoryGroupCard({ category, grouped }: CategoryGroupCardProps)
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-100">
         <div>
-          <h3 className="font-semibold text-sm text-gray-800">{category}</h3>
-          <p className="text-xs text-gray-400 mt-0.5">{items.length} biomarkers</p>
+          <h3 className="font-semibold text-sm text-gray-800">{t(`category.${category}`)}</h3>
+          <p className="text-xs text-gray-400 mt-0.5">{t('group.biomarkersCount', { count: items.length })}</p>
         </div>
         {abnormalCount > 0 && (
           <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-red-50 text-red-600 border border-red-100">
-            {abnormalCount} out of range
+            {t('group.outOfRange', { count: abnormalCount })}
           </span>
         )}
       </div>
@@ -88,14 +90,14 @@ export function CategoryGroupCard({ category, grouped }: CategoryGroupCardProps)
               </div>
 
               {/* Status */}
-              <Badge variant={status} className="capitalize text-xs flex-shrink-0">
-                {status}
+              <Badge variant={status} className="text-xs flex-shrink-0">
+                {t(`status.${status}`)}
               </Badge>
 
               {/* Reference range */}
               {latest.reference_text && (
                 <span className="hidden sm:block text-xs text-gray-400 flex-shrink-0 w-20 text-right truncate">
-                  Ref: {latest.reference_text}
+                  {t('common.ref')}: {latest.reference_text}
                 </span>
               )}
 

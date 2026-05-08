@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils'
+import { useT } from '@/lib/i18n'
 
 interface CategoryTabsProps {
   categories: string[]
@@ -7,6 +8,7 @@ interface CategoryTabsProps {
 }
 
 export function CategoryTabs({ categories, activeCategory, onChange }: CategoryTabsProps) {
+  const { t } = useT()
   const all = ['All', ...categories]
 
   return (
@@ -22,7 +24,7 @@ export function CategoryTabs({ categories, activeCategory, onChange }: CategoryT
               : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
           )}
         >
-          {cat}
+          {t(`category.${cat}`)}
         </button>
       ))}
     </div>

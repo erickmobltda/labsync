@@ -2,6 +2,7 @@ import { CalendarDays } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
+import { useT } from '@/lib/i18n'
 
 interface DateRangePickerProps {
   startDate: string
@@ -12,13 +13,14 @@ interface DateRangePickerProps {
 }
 
 export function DateRangePicker({ startDate, endDate, onStartChange, onEndChange, onClear }: DateRangePickerProps) {
+  const { t } = useT()
   const hasFilter = startDate || endDate
 
   return (
     <div className="flex flex-wrap items-end gap-3">
       <CalendarDays className="h-4 w-4 text-gray-400 self-end mb-2 hidden sm:block" />
       <div className="space-y-1">
-        <Label htmlFor="start-date" className="text-xs">From</Label>
+        <Label htmlFor="start-date" className="text-xs">{t('common.from')}</Label>
         <Input
           id="start-date"
           type="date"
@@ -28,7 +30,7 @@ export function DateRangePicker({ startDate, endDate, onStartChange, onEndChange
         />
       </div>
       <div className="space-y-1">
-        <Label htmlFor="end-date" className="text-xs">To</Label>
+        <Label htmlFor="end-date" className="text-xs">{t('common.to')}</Label>
         <Input
           id="end-date"
           type="date"
@@ -39,7 +41,7 @@ export function DateRangePicker({ startDate, endDate, onStartChange, onEndChange
       </div>
       {hasFilter && (
         <Button variant="ghost" size="sm" onClick={onClear} className="text-xs text-gray-500">
-          Clear dates
+          {t('common.clearDates')}
         </Button>
       )}
     </div>

@@ -5,17 +5,18 @@ import { useAuth } from '@/hooks/useAuth'
 import { useReports } from '@/hooks/useReports'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
-import { formatDate } from '@/lib/utils'
+import { useT } from '@/lib/i18n'
 
 export function ReportsPage() {
   const { user } = useAuth()
   const { reports, loading, error, deleteReport } = useReports(user?.id)
   const navigate = useNavigate()
+  const { t, formatDate } = useT()
   const [deleting, setDeleting] = useState<string | null>(null)
 
   async function handleDelete(id: string, e: React.MouseEvent) {
     e.stopPropagation()
-    if (!confirm('Delete this report and all its biomarkers?')) return
+    if (!confirm(t('reports.deleteConfirm'))) return
     setDeleting(id)
     try {
       await deleteReport(id)
@@ -24,18 +25,23 @@ export function ReportsPage() {
     }
   }
 
+  const countLabel =
+    reports.length === 0
+      ? t('reports.none')
+      : reports.length === 1
+        ? t('reports.countOne', { count: reports.length })
+        : t('reports.countMany', { count: reports.length })
+
   return (
     <div className="p-4 lg:p-6 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">My Reports</h1>
-          <p className="text-sm text-gray-500 mt-0.5">
-            {reports.length > 0 ? `${reports.length} report${reports.length !== 1 ? 's' : ''} uploaded` : 'No reports yet'}
-          </p>
+          <h1 className="text-xl font-bold text-gray-900">{t('reports.title')}</h1>
+          <p className="text-sm text-gray-500 mt-0.5">{countLabel}</p>
         </div>
         <Button size="sm" onClick={() => navigate('/upload')}>
           <Upload className="h-4 w-4" />
-          Upload New
+          {t('common.uploadNew')}
         </Button>
       </div>
 
@@ -50,13 +56,13 @@ export function ReportsPage() {
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 mb-4">
             <FileText className="h-7 w-7 text-gray-400" />
           </div>
-          <h3 className="font-semibold text-gray-700">No reports yet</h3>
+          <h3 className="font-semibold text-gray-700">{t('reports.emptyTitle')}</h3>
           <p className="mt-1.5 text-sm text-gray-500 max-w-xs">
-            Upload your first blood test report to get started.
+            {t('reports.emptySub')}
           </p>
           <Button className="mt-5" onClick={() => navigate('/upload')}>
             <Upload className="h-4 w-4" />
-            Upload Report
+            {t('common.uploadReport')}
           </Button>
         </div>
       ) : (
@@ -72,15 +78,15 @@ export function ReportsPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-gray-900 text-sm">
-                  {report.source_filename ?? 'Pasted text report'}
+                  {report.source_filename ?? t('reports.pastedText')}
                 </p>
                 <p className="text-xs text-gray-500 mt-0.5">
-                  Report date: {formatDate(report.report_date)}
+                  {t('reports.reportDate', { date: formatDate(report.report_date) })}
                 </p>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
                 <span className="text-xs text-gray-400 hidden sm:block">
-                  Added {formatDate(report.created_at)}
+                  {t('reports.added', { date: formatDate(report.created_at) })}
                 </span>
                 <button
                   onClick={e => handleDelete(report.id, e)}

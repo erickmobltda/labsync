@@ -17,12 +17,14 @@ import { SearchFilter } from '@/components/dashboard/SearchFilter'
 import { Spinner } from '@/components/ui/spinner'
 import { Button } from '@/components/ui/button'
 import { ALL_CATEGORIES } from '@/lib/categories'
+import { useT } from '@/lib/i18n'
 
 type ViewMode = 'cards' | 'charts' | 'grouped'
 
 export function DashboardPage() {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const { t } = useT()
 
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
@@ -62,11 +64,11 @@ export function DashboardPage() {
       {/* Page header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Health Dashboard</h1>
+          <h1 className="text-xl font-bold text-gray-900">{t('dash.title')}</h1>
           <p className="text-sm text-gray-500 mt-0.5">
             {biomarkerNames.length > 0
-              ? `${biomarkerNames.length} biomarkers tracked`
-              : 'No data yet — upload your first report'}
+              ? t('dash.tracked', { count: biomarkerNames.length })
+              : t('dash.empty')}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -75,15 +77,15 @@ export function DashboardPage() {
               <button
                 key={mode}
                 onClick={() => setViewMode(mode)}
-                className={`rounded px-2.5 py-1.5 text-xs font-medium capitalize transition-colors ${viewMode === mode ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
+                className={`rounded px-2.5 py-1.5 text-xs font-medium transition-colors ${viewMode === mode ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
               >
-                {mode}
+                {t(`dash.view.${mode}`)}
               </button>
             ))}
           </div>
           <Button size="sm" onClick={() => navigate('/upload')}>
             <Upload className="h-4 w-4" />
-            Upload
+            {t('common.upload')}
           </Button>
         </div>
       </div>
@@ -132,16 +134,16 @@ export function DashboardPage() {
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 mb-4">
             <BarChart3 className="h-7 w-7 text-gray-400" />
           </div>
-          <h3 className="font-semibold text-gray-700">No data to display</h3>
+          <h3 className="font-semibold text-gray-700">{t('dash.noData')}</h3>
           <p className="mt-1.5 text-sm text-gray-500 max-w-xs">
             {search || activeCategory !== 'All' || startDate || endDate
-              ? 'Try adjusting your filters or date range.'
-              : 'Upload your first blood test report to start tracking your health trends.'}
+              ? t('dash.adjustFilters')
+              : t('dash.uploadFirst')}
           </p>
           {!search && activeCategory === 'All' && !startDate && !endDate && (
             <Button className="mt-5" onClick={() => navigate('/upload')}>
               <Upload className="h-4 w-4" />
-              Upload First Report
+              {t('common.uploadFirstReport')}
             </Button>
           )}
         </div>

@@ -3,53 +3,56 @@ import { useNavigate } from 'react-router-dom'
 import { Activity, Upload, TrendingUp, Shield, FileText, BarChart3, Zap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/useAuth'
-
-const features = [
-  {
-    icon: Upload,
-    title: 'Smart Upload',
-    desc: 'Drop a PDF or paste text. Our AI extracts every biomarker automatically.',
-    color: 'bg-blue-50 text-blue-600',
-  },
-  {
-    icon: TrendingUp,
-    title: 'Trend Tracking',
-    desc: 'Interactive charts show how your values change over time, by category.',
-    color: 'bg-teal-50 text-teal-600',
-  },
-  {
-    icon: Shield,
-    title: 'Private & Secure',
-    desc: 'Your data is encrypted and row-level isolated — only you can see it.',
-    color: 'bg-green-50 text-green-600',
-  },
-  {
-    icon: FileText,
-    title: 'Any Lab Format',
-    desc: 'Works with reports from any laboratory, worldwide.',
-    color: 'bg-purple-50 text-purple-600',
-  },
-  {
-    icon: BarChart3,
-    title: 'Categorical Views',
-    desc: 'Lipid Panel, Blood Count, Thyroid, Vitamins — grouped intelligently.',
-    color: 'bg-orange-50 text-orange-600',
-  },
-  {
-    icon: Zap,
-    title: 'Instant Insights',
-    desc: 'Status indicators highlight high, low, and normal values at a glance.',
-    color: 'bg-yellow-50 text-yellow-600',
-  },
-]
+import { useT } from '@/lib/i18n'
+import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher'
 
 export function LandingPage() {
   const { user, loading } = useAuth()
   const navigate = useNavigate()
+  const { t } = useT()
 
   useEffect(() => {
     if (!loading && user) navigate('/dashboard')
   }, [user, loading, navigate])
+
+  const features = [
+    {
+      icon: Upload,
+      title: t('landing.feat.smartUpload.title'),
+      desc: t('landing.feat.smartUpload.desc'),
+      color: 'bg-blue-50 text-blue-600',
+    },
+    {
+      icon: TrendingUp,
+      title: t('landing.feat.trend.title'),
+      desc: t('landing.feat.trend.desc'),
+      color: 'bg-teal-50 text-teal-600',
+    },
+    {
+      icon: Shield,
+      title: t('landing.feat.private.title'),
+      desc: t('landing.feat.private.desc'),
+      color: 'bg-green-50 text-green-600',
+    },
+    {
+      icon: FileText,
+      title: t('landing.feat.anyLab.title'),
+      desc: t('landing.feat.anyLab.desc'),
+      color: 'bg-purple-50 text-purple-600',
+    },
+    {
+      icon: BarChart3,
+      title: t('landing.feat.categorical.title'),
+      desc: t('landing.feat.categorical.desc'),
+      color: 'bg-orange-50 text-orange-600',
+    },
+    {
+      icon: Zap,
+      title: t('landing.feat.insights.title'),
+      desc: t('landing.feat.insights.desc'),
+      color: 'bg-yellow-50 text-yellow-600',
+    },
+  ]
 
   return (
     <div className="min-h-screen bg-white">
@@ -61,9 +64,10 @@ export function LandingPage() {
           </div>
           LabSync
         </div>
-        <div className="ml-auto flex gap-3">
-          <Button variant="ghost" size="sm" onClick={() => navigate('/login')}>Sign in</Button>
-          <Button size="sm" onClick={() => navigate('/login')}>Get started free</Button>
+        <div className="ml-auto flex items-center gap-3">
+          <LanguageSwitcher variant="compact" />
+          <Button variant="ghost" size="sm" onClick={() => navigate('/login')}>{t('landing.signInBtn')}</Button>
+          <Button size="sm" onClick={() => navigate('/login')}>{t('landing.getStartedFree')}</Button>
         </div>
       </nav>
 
@@ -72,21 +76,21 @@ export function LandingPage() {
         <div className="mx-auto max-w-3xl">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary-50 border border-primary-100 px-3 py-1 text-xs font-medium text-primary-700">
             <Activity className="h-3.5 w-3.5" />
-            Blood test intelligence
+            {t('brand.tagline')}
           </div>
           <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl text-balance">
-            Your health data,<br />
-            <span className="text-primary-600">beautifully organized</span>
+            {t('landing.heroTitleA')}<br />
+            <span className="text-primary-600">{t('landing.heroTitleB')}</span>
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-lg text-gray-600 text-balance">
-            Upload any blood test PDF and instantly see your biomarker trends over time — with status indicators, category grouping, and interactive charts.
+            {t('landing.heroSubtitle')}
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
             <Button size="lg" onClick={() => navigate('/login')}>
-              Start for free
+              {t('landing.startForFree')}
             </Button>
             <Button size="lg" variant="outline" onClick={() => navigate('/login')}>
-              See a demo →
+              {t('landing.seeDemo')}
             </Button>
           </div>
         </div>
@@ -96,7 +100,7 @@ export function LandingPage() {
       <section className="px-4 py-16 lg:py-20">
         <div className="mx-auto max-w-5xl">
           <h2 className="mb-10 text-center text-2xl font-bold text-gray-900">
-            Everything you need to understand your health
+            {t('landing.featuresTitle')}
           </h2>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {features.map(({ icon: Icon, title, desc, color }) => (
@@ -115,23 +119,23 @@ export function LandingPage() {
       {/* CTA */}
       <section className="bg-primary-600 px-4 py-16 text-center text-white">
         <div className="mx-auto max-w-xl">
-          <h2 className="text-2xl font-bold">Take control of your health data</h2>
+          <h2 className="text-2xl font-bold">{t('landing.ctaTitle')}</h2>
           <p className="mt-3 text-primary-200">
-            Free to use. No credit card required. Your data stays yours.
+            {t('landing.ctaSubtitle')}
           </p>
           <Button
             size="lg"
             className="mt-6 bg-white text-primary-700 hover:bg-primary-50"
             onClick={() => navigate('/login')}
           >
-            Get started — it's free
+            {t('landing.ctaButton')}
           </Button>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="border-t border-gray-100 bg-gray-50 px-4 py-6 text-center text-xs text-gray-400">
-        <p>LabSync is a data consolidation tool only. Not medical advice or diagnosis.</p>
+        <p>{t('landing.footerLine1')}</p>
         <p className="mt-1">© {new Date().getFullYear()} LabSync</p>
       </footer>
     </div>

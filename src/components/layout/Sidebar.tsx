@@ -1,14 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { LayoutDashboard, Upload, FileText, Activity, Calendar, Pill } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
-const navItems = [
-  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/upload', icon: Upload, label: 'Upload Report' },
-  { to: '/reports', icon: FileText, label: 'My Reports' },
-  { to: '/appointments', icon: Calendar, label: 'Appointments' },
-  { to: '/medicines', icon: Pill, label: 'Medicines' },
-]
+import { useT } from '@/lib/i18n'
 
 interface SidebarProps {
   open?: boolean
@@ -16,6 +9,14 @@ interface SidebarProps {
 }
 
 export function Sidebar({ open, onClose }: SidebarProps) {
+  const { t } = useT()
+  const navItems = [
+    { to: '/dashboard', icon: LayoutDashboard, label: t('nav.dashboard') },
+    { to: '/upload', icon: Upload, label: t('nav.upload') },
+    { to: '/reports', icon: FileText, label: t('nav.reports') },
+    { to: '/appointments', icon: Calendar, label: t('nav.appointments') },
+    { to: '/medicines', icon: Pill, label: t('nav.medicines') },
+  ]
   return (
     <>
       {/* Mobile overlay */}

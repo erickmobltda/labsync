@@ -9,6 +9,7 @@ import { ExtractionPreview } from '@/components/upload/ExtractionPreview'
 import { Spinner } from '@/components/ui/spinner'
 import { ToastContainer, useToast } from '@/components/ui/toast'
 import type { ExtractedReport } from '@/types'
+import { useT } from '@/lib/i18n'
 
 type Step = 'upload' | 'extracting' | 'preview' | 'saving'
 
@@ -17,6 +18,7 @@ export function UploadPage() {
   const { saveReport } = useReports(user?.id)
   const navigate = useNavigate()
   const { toasts, toast, close } = useToast()
+  const { t } = useT()
 
   const [step, setStep] = useState<Step>('upload')
   const [extracted, setExtracted] = useState<ExtractedReport | null>(null)
@@ -37,7 +39,7 @@ export function UploadPage() {
       setExtracted(result)
       setStep('preview')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Extraction failed')
+      setError(err instanceof Error ? err.message : t('upload.extractFailed'))
       setStep('upload')
     }
   }
@@ -53,7 +55,7 @@ export function UploadPage() {
       setExtracted(result)
       setStep('preview')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Extraction failed')
+      setError(err instanceof Error ? err.message : t('upload.extractFailed'))
       setStep('upload')
     }
   }
@@ -63,11 +65,11 @@ export function UploadPage() {
     setStep('saving')
     try {
       await saveReport(extracted, sourceFilename, rawText, sourceFile)
-      toast('Report saved successfully!', 'success')
+      toast(t('upload.savedSuccess'), 'success')
       setTimeout(() => navigate('/dashboard'), 1000)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Save failed')
-      toast('Failed to save report', 'error')
+      setError(err instanceof Error ? err.message : t('upload.saveFailed'))
+      toast(t('upload.savedFailed'), 'error')
       setStep('preview')
     }
   }
@@ -84,9 +86,9 @@ export function UploadPage() {
   return (
     <div className="p-4 lg:p-6 max-w-3xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-xl font-bold text-gray-900">Upload Lab Report</h1>
+        <h1 className="text-xl font-bold text-gray-900">{t('upload.title')}</h1>
         <p className="text-sm text-gray-500 mt-0.5">
-          Upload a PDF or paste text — we'll extract and structure your biomarkers automatically.
+          {t('upload.subtitle')}
         </p>
       </div>
 
@@ -106,8 +108,8 @@ export function UploadPage() {
           <div className="flex flex-col items-center gap-4 py-12">
             <Spinner size="lg" />
             <div className="text-center">
-              <p className="font-medium text-gray-700">Analyzing your report…</p>
-              <p className="mt-1 text-sm text-gray-400">Claude is extracting your biomarkers</p>
+              <p className="font-medium text-gray-700">{t('upload.analyzing')}</p>
+              <p className="mt-1 text-sm text-gray-400">{t('upload.claudeExtracting')}</p>
             </div>
           </div>
         )}
@@ -126,12 +128,12 @@ export function UploadPage() {
       {/* Tips */}
       {step === 'upload' && (
         <div className="mt-5 rounded-xl bg-blue-50 border border-blue-100 p-4">
-          <h3 className="text-sm font-semibold text-blue-800 mb-2">Tips for best results</h3>
+          <h3 className="text-sm font-semibold text-blue-800 mb-2">{t('upload.tipsTitle')}</h3>
           <ul className="space-y-1 text-xs text-blue-700">
-            <li>• Use the original PDF from your laboratory, not a scanned photo</li>
-            <li>• Reports with clear table formatting extract most accurately</li>
-            <li>• You can review and confirm the extracted data before saving</li>
-            <li>• Supported: complete blood count, lipid panel, metabolic panel, thyroid, vitamins, and more</li>
+            <li>• {t('upload.tip1')}</li>
+            <li>• {t('upload.tip2')}</li>
+            <li>• {t('upload.tip3')}</li>
+            <li>• {t('upload.tip4')}</li>
           </ul>
         </div>
       )}

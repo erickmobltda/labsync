@@ -1,6 +1,8 @@
 import { Activity, LogOut, User, Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/useAuth'
+import { useT } from '@/lib/i18n'
+import { LanguageSwitcher } from './LanguageSwitcher'
 
 interface HeaderProps {
   onMenuClick?: () => void
@@ -8,6 +10,7 @@ interface HeaderProps {
 
 export function Header({ onMenuClick }: HeaderProps) {
   const { user, signOut } = useAuth()
+  const { t } = useT()
 
   return (
     <header className="sticky top-0 z-40 flex h-14 items-center border-b border-gray-100 bg-white/95 backdrop-blur px-4 lg:px-6">
@@ -26,6 +29,7 @@ export function Header({ onMenuClick }: HeaderProps) {
       </div>
 
       <div className="ml-auto flex items-center gap-3">
+        <LanguageSwitcher />
         {user && (
           <>
             <div className="hidden sm:flex items-center gap-1.5 text-sm text-gray-500">
@@ -34,7 +38,7 @@ export function Header({ onMenuClick }: HeaderProps) {
             </div>
             <Button variant="ghost" size="sm" onClick={signOut} className="text-gray-500">
               <LogOut className="h-4 w-4" />
-              <span className="hidden sm:inline">Sign out</span>
+              <span className="hidden sm:inline">{t('common.signOut')}</span>
             </Button>
           </>
         )}
