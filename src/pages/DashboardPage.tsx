@@ -10,6 +10,7 @@ import { BiomarkerCard } from '@/components/dashboard/BiomarkerCard'
 import { BiomarkerChart } from '@/components/dashboard/BiomarkerChart'
 import { InsightsPanel } from '@/components/dashboard/InsightsPanel'
 import { HealthSummaryPanel } from '@/components/dashboard/HealthSummaryPanel'
+import { TodayMedicinesPanel } from '@/components/dashboard/TodayMedicinesPanel'
 import { CategoryGroupCard } from '@/components/dashboard/CategoryGroupCard'
 import { CategoryTabs } from '@/components/dashboard/CategoryTabs'
 import { DateRangePicker } from '@/components/dashboard/DateRangePicker'
@@ -92,6 +93,9 @@ export function DashboardPage() {
 
       {/* Health summary */}
       <HealthSummaryPanel appointments={appointments} medicines={medicines} />
+
+      {/* Today's medicines */}
+      <TodayMedicinesPanel medicines={medicines} />
 
       {/* Filters */}
       <div className="flex flex-col gap-3 rounded-xl bg-white border border-gray-100 p-4 shadow-sm">

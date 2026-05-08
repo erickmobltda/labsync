@@ -315,6 +315,14 @@ const dictionaries: Record<Language, Record<string, string>> = {
     'summary.moreNeedRefill': '+{count} a mais para repor',
     'summary.moreActive': '+{count} a mais',
 
+    // Today's medicines (dashboard)
+    'today.title': 'Medicamentos de hoje',
+    'today.subtitle': '{count} ativos',
+    'today.pill': '{count} comprimido',
+    'today.pills': '{count} comprimidos',
+    'today.timesPerDay': '{count}×/dia',
+    'today.noSchedule': 'sem horário definido',
+
     // Appointments page
     'appt.title': 'Consultas',
     'appt.summary': '{upcoming} futuras · {past} passadas',
@@ -653,6 +661,14 @@ const dictionaries: Record<Language, Record<string, string>> = {
     'summary.buyBy': 'Buy by {date}',
     'summary.moreNeedRefill': '+{count} more need refill',
     'summary.moreActive': '+{count} more',
+
+    // Today's medicines (dashboard)
+    'today.title': "Today's medicines",
+    'today.subtitle': '{count} active',
+    'today.pill': '{count} pill',
+    'today.pills': '{count} pills',
+    'today.timesPerDay': '{count}×/day',
+    'today.noSchedule': 'no schedule set',
 
     // Appointments page
     'appt.title': 'Appointments',
