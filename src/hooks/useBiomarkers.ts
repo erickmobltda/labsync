@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+import { IS_LOCAL, apiFetch } from '@/lib/data-api'
 import { useT } from '@/lib/i18n'
 import type { BiomarkerWithDate } from '@/types'
 
@@ -25,6 +26,22 @@ export function useBiomarkers(userId?: string, filters: BiomarkerFilters = {}) {
     setLoading(true)
     setError(null)
 
+    if (IS_LOCAL) {
+      const params = new URLSearchParams()
+      if (filters.startDate) params.set('startDate', filters.startDate)
+      if (filters.endDate) params.set('endDate', filters.endDate)
+      if (filters.category && filters.category !== 'All') params.set('category', filters.category)
+
+      const { data, error } = await apiFetch<BiomarkerWithDate[]>(
+        `/api/biomarkers?${params.toString()}`,
+      )
+      if (error) setError(error.message)
+      else setAllBiomarkers(data ?? [])
+      setLoading(false)
+      return
+    }
+
+    // --- Supabase path ---
     let query = supabase
       .from('biomarkers')
       .select('*, lab_reports!inner(report_date)')
@@ -54,7 +71,6 @@ export function useBiomarkers(userId?: string, filters: BiomarkerFilters = {}) {
     setLoading(false)
   }
 
-  // Search client-side so it matches both the stored canonical name and its translation
   const biomarkers = filters.search
     ? allBiomarkers.filter(b => {
         const q = filters.search!.toLowerCase()
@@ -65,14 +81,12 @@ export function useBiomarkers(userId?: string, filters: BiomarkerFilters = {}) {
       })
     : allBiomarkers
 
-  // Group biomarkers by name for charting
   const grouped = biomarkers.reduce<Record<string, BiomarkerWithDate[]>>((acc, b) => {
     if (!acc[b.name]) acc[b.name] = []
     acc[b.name].push(b)
     return acc
   }, {})
 
-  // Get unique categories from current data
   const categories = Array.from(new Set(biomarkers.map(b => b.category ?? 'Other')))
 
   return { biomarkers, grouped, categories, loading, error, refetch: fetchBiomarkers }
