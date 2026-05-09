@@ -40,7 +40,6 @@ export function useReports(userId?: string) {
       storagePath = await uploadReportPdf(file, user.id)
     }
 
-    // Insert report
     const { data: report, error: reportError } = await supabase
       .from('lab_reports')
       .insert({
@@ -60,7 +59,6 @@ export function useReports(userId?: string) {
       throw reportError
     }
 
-    // Insert biomarkers
     const biomarkers = extracted.biomarkers.map(b => ({
       report_id: report.id,
       user_id: user.id,
@@ -77,7 +75,6 @@ export function useReports(userId?: string) {
 
     const { error: bioError } = await supabase.from('biomarkers').insert(biomarkers)
     if (bioError) {
-      // Roll back the lab_reports row and uploaded PDF so we don't leave orphans
       await supabase.from('lab_reports').delete().eq('id', report.id)
       if (storagePath) {
         await deleteReportPdf(storagePath).catch(() => {})

@@ -54,7 +54,6 @@ export function useBiomarkers(userId?: string, filters: BiomarkerFilters = {}) {
     setLoading(false)
   }
 
-  // Search client-side so it matches both the stored canonical name and its translation
   const biomarkers = filters.search
     ? allBiomarkers.filter(b => {
         const q = filters.search!.toLowerCase()
@@ -65,14 +64,12 @@ export function useBiomarkers(userId?: string, filters: BiomarkerFilters = {}) {
       })
     : allBiomarkers
 
-  // Group biomarkers by name for charting
   const grouped = biomarkers.reduce<Record<string, BiomarkerWithDate[]>>((acc, b) => {
     if (!acc[b.name]) acc[b.name] = []
     acc[b.name].push(b)
     return acc
   }, {})
 
-  // Get unique categories from current data
   const categories = Array.from(new Set(biomarkers.map(b => b.category ?? 'Other')))
 
   return { biomarkers, grouped, categories, loading, error, refetch: fetchBiomarkers }

@@ -19,6 +19,13 @@ dist-ssr
 .env.test.local
 .env.production.local
 
+# Local data (SQLite DB + uploads in dev mode)
+server/data/
+data/
+
+# Server build output
+server/dist/
+
 # Editor
 .vscode/*
 !.vscode/extensions.json
