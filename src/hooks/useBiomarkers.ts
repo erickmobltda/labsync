@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import { IS_LOCAL, apiFetch } from '@/lib/data-api'
 import { useT } from '@/lib/i18n'
 import type { BiomarkerWithDate } from '@/types'
 
@@ -26,22 +25,6 @@ export function useBiomarkers(userId?: string, filters: BiomarkerFilters = {}) {
     setLoading(true)
     setError(null)
 
-    if (IS_LOCAL) {
-      const params = new URLSearchParams()
-      if (filters.startDate) params.set('startDate', filters.startDate)
-      if (filters.endDate) params.set('endDate', filters.endDate)
-      if (filters.category && filters.category !== 'All') params.set('category', filters.category)
-
-      const { data, error } = await apiFetch<BiomarkerWithDate[]>(
-        `/api/biomarkers?${params.toString()}`,
-      )
-      if (error) setError(error.message)
-      else setAllBiomarkers(data ?? [])
-      setLoading(false)
-      return
-    }
-
-    // --- Supabase path ---
     let query = supabase
       .from('biomarkers')
       .select('*, lab_reports!inner(report_date)')

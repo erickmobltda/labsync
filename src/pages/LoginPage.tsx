@@ -5,7 +5,6 @@ import { EmailPasswordForm } from '@/components/auth/EmailPasswordForm'
 import { MagicLinkForm } from '@/components/auth/MagicLinkForm'
 import { useAuth } from '@/hooks/useAuth'
 import { useT } from '@/lib/i18n'
-import { IS_LOCAL } from '@/lib/data-api'
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher'
 
 export function LoginPage() {
@@ -55,22 +54,19 @@ export function LoginPage() {
             </>
           )}
 
-          {!IS_LOCAL && (
-            <>
-              <div className="mt-6 flex items-center gap-3">
-                <div className="h-px flex-1 bg-gray-200" />
-                <span className="text-xs text-gray-400">{t('zone.or')}</span>
-                <div className="h-px flex-1 bg-gray-200" />
-              </div>
-              <button
-                type="button"
-                onClick={() => setUseMagicLink(v => !v)}
-                className="mt-4 w-full text-sm text-primary-600 hover:underline"
-              >
-                {useMagicLink ? t('login.usePasswordInstead') : t('login.useMagicInstead')}
-              </button>
-            </>
-          )}
+          <div className="mt-6 flex items-center gap-3">
+            <div className="h-px flex-1 bg-gray-200" />
+            <span className="text-xs text-gray-400">{t('zone.or')}</span>
+            <div className="h-px flex-1 bg-gray-200" />
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setUseMagicLink(v => !v)}
+            className="mt-4 w-full text-sm text-primary-600 hover:underline"
+          >
+            {useMagicLink ? t('login.usePasswordInstead') : t('login.useMagicInstead')}
+          </button>
         </div>
 
         {/* Features */}

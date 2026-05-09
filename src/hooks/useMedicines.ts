@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import { IS_LOCAL, apiFetch } from '@/lib/data-api'
 import type { Medicine } from '@/types'
 
 export type MedicineInput = Omit<Medicine, 'id' | 'user_id' | 'created_at'>
@@ -18,31 +17,16 @@ export function useMedicines(userId?: string) {
 
   async function fetchMedicines() {
     setLoading(true)
-    if (IS_LOCAL) {
-      const { data, error } = await apiFetch<Medicine[]>('/api/medicines')
-      if (error) setError(error.message)
-      else setMedicines(data ?? [])
-    } else {
-      const { data, error } = await supabase
-        .from('medicines')
-        .select('*')
-        .order('start_date', { ascending: false })
-      if (error) setError(error.message)
-      else setMedicines(data ?? [])
-    }
+    const { data, error } = await supabase
+      .from('medicines')
+      .select('*')
+      .order('start_date', { ascending: false })
+    if (error) setError(error.message)
+    else setMedicines(data ?? [])
     setLoading(false)
   }
 
   async function saveMedicine(input: MedicineInput): Promise<Medicine> {
-    if (IS_LOCAL) {
-      const { data, error } = await apiFetch<Medicine>('/api/medicines', {
-        method: 'POST',
-        body: JSON.stringify(input),
-      })
-      if (error) throw new Error(error.message)
-      await fetchMedicines()
-      return data!
-    }
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Not authenticated')
     const { data, error } = await supabase
@@ -56,15 +40,6 @@ export function useMedicines(userId?: string) {
   }
 
   async function updateMedicine(id: string, input: MedicineInput): Promise<Medicine> {
-    if (IS_LOCAL) {
-      const { data, error } = await apiFetch<Medicine>(`/api/medicines/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(input),
-      })
-      if (error) throw new Error(error.message)
-      await fetchMedicines()
-      return data!
-    }
     const { data, error } = await supabase
       .from('medicines')
       .update(input)
@@ -77,23 +52,12 @@ export function useMedicines(userId?: string) {
   }
 
   async function deleteMedicine(id: string) {
-    if (IS_LOCAL) {
-      const { error } = await apiFetch(`/api/medicines/${id}`, { method: 'DELETE' })
-      if (error) throw new Error(error.message)
-      setMedicines(prev => prev.filter(m => m.id !== id))
-      return
-    }
     const { error } = await supabase.from('medicines').delete().eq('id', id)
     if (error) throw error
     setMedicines(prev => prev.filter(m => m.id !== id))
   }
 
   async function getMedicine(id: string): Promise<Medicine | null> {
-    if (IS_LOCAL) {
-      const { data, error } = await apiFetch<Medicine>(`/api/medicines/${id}`)
-      if (error) throw new Error(error.message)
-      return data
-    }
     const { data, error } = await supabase
       .from('medicines')
       .select('*')

@@ -13,15 +13,6 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['pdfjs-dist'],
   },
-  // Proxy /api/* to the local backend when running `npm run dev:local`
-  server: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:3001',
-        changeOrigin: true,
-      },
-    },
-  },
   build: {
     chunkSizeWarningLimit: 1500,
     rollupOptions: {

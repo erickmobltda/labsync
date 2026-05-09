@@ -4,7 +4,6 @@ import type { LabReport, ExtractedReport, Biomarker } from '@/types'
 import { resolveCategory } from '@/lib/categories'
 import { computeStatus } from '@/lib/utils'
 import { uploadReportPdf, deleteReportPdf } from '@/lib/storage'
-import { IS_LOCAL, apiFetch, getLocalUser } from '@/lib/data-api'
 
 export function useReports(userId?: string) {
   const [reports, setReports] = useState<LabReport[]>([])
@@ -18,18 +17,12 @@ export function useReports(userId?: string) {
 
   async function fetchReports() {
     setLoading(true)
-    if (IS_LOCAL) {
-      const { data, error } = await apiFetch<LabReport[]>('/api/reports')
-      if (error) setError(error.message)
-      else setReports(data ?? [])
-    } else {
-      const { data, error } = await supabase
-        .from('lab_reports')
-        .select('*')
-        .order('report_date', { ascending: false })
-      if (error) setError(error.message)
-      else setReports(data ?? [])
-    }
+    const { data, error } = await supabase
+      .from('lab_reports')
+      .select('*')
+      .order('report_date', { ascending: false })
+    if (error) setError(error.message)
+    else setReports(data ?? [])
     setLoading(false)
   }
 
@@ -37,50 +30,8 @@ export function useReports(userId?: string) {
     extracted: ExtractedReport,
     filename: string | null,
     rawText: string,
-    file: File | null = null,
+    file: File | null = null
   ): Promise<string> {
-    if (IS_LOCAL) {
-      const localUser = getLocalUser()
-      if (!localUser) throw new Error('Not authenticated')
-
-      let storagePath: string | null = null
-      if (file) {
-        storagePath = await uploadReportPdf(file, localUser.id)
-      }
-
-      const biomarkers = extracted.biomarkers.map(b => ({
-        name: b.name,
-        value: b.value ?? null,
-        value_text: b.value_text ?? null,
-        unit: b.unit || null,
-        reference_min: b.reference_min ?? null,
-        reference_max: b.reference_max ?? null,
-        reference_text: b.reference_text || null,
-        status: computeStatus(b.value, b.reference_min, b.reference_max),
-        category: resolveCategory(b.name),
-      }))
-
-      const { data, error } = await apiFetch<LabReport>('/api/reports', {
-        method: 'POST',
-        body: JSON.stringify({
-          report_date: extracted.report_date,
-          source_filename: filename,
-          raw_text: rawText,
-          storage_path: storagePath,
-          biomarkers,
-        }),
-      })
-
-      if (error) {
-        if (storagePath) await deleteReportPdf(storagePath).catch(() => {})
-        throw new Error(error.message)
-      }
-
-      await fetchReports()
-      return data!.id
-    }
-
-    // --- Supabase path (unchanged) ---
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Not authenticated')
 
@@ -102,7 +53,9 @@ export function useReports(userId?: string) {
       .single()
 
     if (reportError) {
-      if (storagePath) await deleteReportPdf(storagePath).catch(() => {})
+      if (storagePath) {
+        await deleteReportPdf(storagePath).catch(() => {})
+      }
       throw reportError
     }
 
@@ -123,7 +76,9 @@ export function useReports(userId?: string) {
     const { error: bioError } = await supabase.from('biomarkers').insert(biomarkers)
     if (bioError) {
       await supabase.from('lab_reports').delete().eq('id', report.id)
-      if (storagePath) await deleteReportPdf(storagePath).catch(() => {})
+      if (storagePath) {
+        await deleteReportPdf(storagePath).catch(() => {})
+      }
       throw bioError
     }
 
@@ -133,23 +88,15 @@ export function useReports(userId?: string) {
 
   async function deleteReport(id: string) {
     const target = reports.find(r => r.id === id)
-    if (IS_LOCAL) {
-      const { error } = await apiFetch(`/api/reports/${id}`, { method: 'DELETE' })
-      if (error) throw new Error(error.message)
-    } else {
-      const { error } = await supabase.from('lab_reports').delete().eq('id', id)
-      if (error) throw error
-      if (target?.storage_path) await deleteReportPdf(target.storage_path).catch(() => {})
+    const { error } = await supabase.from('lab_reports').delete().eq('id', id)
+    if (error) throw error
+    if (target?.storage_path) {
+      await deleteReportPdf(target.storage_path).catch(() => {})
     }
     setReports(prev => prev.filter(r => r.id !== id))
   }
 
   async function fetchReportBiomarkers(reportId: string): Promise<Biomarker[]> {
-    if (IS_LOCAL) {
-      const { data, error } = await apiFetch<Biomarker[]>(`/api/reports/${reportId}/biomarkers`)
-      if (error) throw new Error(error.message)
-      return data ?? []
-    }
     const { data, error } = await supabase
       .from('biomarkers')
       .select('*')

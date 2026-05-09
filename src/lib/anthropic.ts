@@ -1,29 +1,17 @@
 import { supabase } from '@/lib/supabase'
-import { IS_LOCAL, apiFetch } from '@/lib/data-api'
 import type { ExtractedReport } from '@/types'
 import { resolveCategory } from './categories'
 import { computeStatus, parseReferenceRange } from './utils'
 
 export async function extractBiomarkers(rawText: string): Promise<ExtractedReport> {
-  let rawData: unknown
+  const { data, error } = await supabase.functions.invoke('extract-biomarkers', {
+    body: { text: rawText },
+  })
 
-  if (IS_LOCAL) {
-    const { data, error } = await apiFetch<ExtractedReport>('/api/functions/extract-biomarkers', {
-      method: 'POST',
-      body: JSON.stringify({ text: rawText }),
-    })
-    if (error) throw new Error(error.message)
-    rawData = data
-  } else {
-    const { data, error } = await supabase.functions.invoke('extract-biomarkers', {
-      body: { text: rawText },
-    })
-    if (error) throw new Error(error.message)
-    if (data.error) throw new Error(data.error)
-    rawData = data
-  }
+  if (error) throw new Error(error.message)
+  if (data.error) throw new Error(data.error)
 
-  const parsed = rawData as ExtractedReport
+  const parsed = data as ExtractedReport
 
   const enriched = parsed.biomarkers.map(b => {
     const refRange = b.reference_text

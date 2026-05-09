@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react'
 import { HashRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
-import { IS_LOCAL } from '@/lib/data-api'
 import { AppShell } from '@/components/layout/AppShell'
 import { LandingPage } from '@/pages/LandingPage'
 import { LoginPage } from '@/pages/LoginPage'
@@ -38,8 +37,7 @@ function CatchAll() {
   const handled = useRef(false)
 
   useEffect(() => {
-    // In local mode there are no magic links — just go home
-    if (IS_LOCAL || !hasAuthToken) {
+    if (!hasAuthToken) {
       navigate('/', { replace: true })
       return
     }
