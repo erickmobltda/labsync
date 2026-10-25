@@ -24,7 +24,7 @@ export function useAuth() {
   }, [])
 
   async function signInWithMagicLink(email: string) {
-    const redirectTo = `${window.location.origin}/labsync/`
+    const redirectTo = `${window.location.origin}${import.meta.env.BASE_URL}`
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: { emailRedirectTo: redirectTo },
@@ -38,7 +38,7 @@ export function useAuth() {
   }
 
   async function signUpWithPassword(email: string, password: string) {
-    const redirectTo = `${window.location.origin}/labsync/`
+    const redirectTo = `${window.location.origin}${import.meta.env.BASE_URL}`
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
