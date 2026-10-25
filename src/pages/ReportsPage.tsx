@@ -9,7 +9,7 @@ import { useT } from '@/lib/i18n'
 
 export function ReportsPage() {
   const { user } = useAuth()
-  const { reports, loading, error, deleteReport } = useReports(user?.id)
+  const { reports, loading, error, deleteReport } = useReports(user?.uid)
   const navigate = useNavigate()
   const { t, formatDate } = useT()
   const [deleting, setDeleting] = useState<string | null>(null)

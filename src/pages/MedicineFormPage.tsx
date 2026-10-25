@@ -20,7 +20,7 @@ export function MedicineFormPage() {
   const isEdit = Boolean(id) && id !== 'new'
   const { user } = useAuth()
   const navigate = useNavigate()
-  const { saveMedicine, updateMedicine, getMedicine } = useMedicines(user?.id)
+  const { saveMedicine, updateMedicine, getMedicine } = useMedicines(user?.uid)
   const { toasts, toast, close } = useToast()
   const { t } = useT()
 

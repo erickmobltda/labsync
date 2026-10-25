@@ -21,7 +21,7 @@ export function AppointmentFormPage() {
   const isEdit = Boolean(id) && id !== 'new'
   const { user } = useAuth()
   const navigate = useNavigate()
-  const { saveAppointment, updateAppointment, getAppointment } = useAppointments(user?.id)
+  const { saveAppointment, updateAppointment, getAppointment } = useAppointments(user?.uid)
   const { toasts, toast, close } = useToast()
   const { t } = useT()
 

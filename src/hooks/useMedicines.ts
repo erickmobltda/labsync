@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { addDoc, deleteDoc, getDoc, getDocs, updateDoc } from 'firebase/firestore'
+import { currentUid, userCollection, userDoc } from '@/lib/firebase'
 import type { Medicine } from '@/types'
 
 export type MedicineInput = Omit<Medicine, 'id' | 'user_id' | 'created_at'>
@@ -17,54 +18,40 @@ export function useMedicines(userId?: string) {
 
   async function fetchMedicines() {
     setLoading(true)
-    const { data, error } = await supabase
-      .from('medicines')
-      .select('*')
-      .order('start_date', { ascending: false })
-    if (error) setError(error.message)
-    else setMedicines(data ?? [])
+    try {
+      const snap = await getDocs(userCollection('medicines'))
+      setMedicines(
+        snap.docs
+          .map(d => ({ id: d.id, ...d.data() }) as Medicine)
+          .sort((a, b) => b.start_date.localeCompare(a.start_date)),
+      )
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load medicines')
+    }
     setLoading(false)
   }
 
   async function saveMedicine(input: MedicineInput): Promise<Medicine> {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('Not authenticated')
-    const { data, error } = await supabase
-      .from('medicines')
-      .insert({ ...input, user_id: user.id })
-      .select()
-      .single()
-    if (error) throw error
+    const row = { ...input, user_id: currentUid(), created_at: new Date().toISOString() }
+    const ref = await addDoc(userCollection('medicines'), row)
     await fetchMedicines()
-    return data
+    return { id: ref.id, ...row }
   }
 
   async function updateMedicine(id: string, input: MedicineInput): Promise<Medicine> {
-    const { data, error } = await supabase
-      .from('medicines')
-      .update(input)
-      .eq('id', id)
-      .select()
-      .single()
-    if (error) throw error
+    await updateDoc(userDoc('medicines', id), { ...input })
     await fetchMedicines()
-    return data
+    return (await getMedicine(id))!
   }
 
   async function deleteMedicine(id: string) {
-    const { error } = await supabase.from('medicines').delete().eq('id', id)
-    if (error) throw error
+    await deleteDoc(userDoc('medicines', id))
     setMedicines(prev => prev.filter(m => m.id !== id))
   }
 
   async function getMedicine(id: string): Promise<Medicine | null> {
-    const { data, error } = await supabase
-      .from('medicines')
-      .select('*')
-      .eq('id', id)
-      .maybeSingle()
-    if (error) throw error
-    return data
+    const snap = await getDoc(userDoc('medicines', id))
+    return snap.exists() ? ({ id: snap.id, ...snap.data() } as Medicine) : null
   }
 
   return {

@@ -20,7 +20,7 @@ export default defineConfig({
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
           'chart-vendor': ['recharts'],
-          'supabase-vendor': ['@supabase/supabase-js'],
+          'firebase-vendor': ['firebase/app', 'firebase/auth', 'firebase/firestore'],
           'anthropic-vendor': ['@anthropic-ai/sdk'],
         },
       },

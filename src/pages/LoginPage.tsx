@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Activity, Shield, TrendingUp, FileText } from 'lucide-react'
 import { EmailPasswordForm } from '@/components/auth/EmailPasswordForm'
-import { MagicLinkForm } from '@/components/auth/MagicLinkForm'
 import { useAuth } from '@/hooks/useAuth'
 import { useT } from '@/lib/i18n'
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher'
@@ -11,7 +10,6 @@ export function LoginPage() {
   const { user, loading } = useAuth()
   const navigate = useNavigate()
   const { t } = useT()
-  const [useMagicLink, setUseMagicLink] = useState(false)
 
   useEffect(() => {
     if (!loading && user) navigate('/dashboard')
@@ -40,33 +38,9 @@ export function LoginPage() {
 
         {/* Card */}
         <div className="rounded-2xl bg-white border border-gray-100 shadow-xl p-8">
-          {useMagicLink ? (
-            <>
-              <h2 className="mb-1 text-lg font-semibold text-gray-900">{t('login.magicTitle')}</h2>
-              <p className="mb-6 text-sm text-gray-500">{t('login.magicSubtitle')}</p>
-              <MagicLinkForm />
-            </>
-          ) : (
-            <>
-              <h2 className="mb-1 text-lg font-semibold text-gray-900">{t('login.passwordTitle')}</h2>
-              <p className="mb-6 text-sm text-gray-500">{t('login.passwordSubtitle')}</p>
-              <EmailPasswordForm />
-            </>
-          )}
-
-          <div className="mt-6 flex items-center gap-3">
-            <div className="h-px flex-1 bg-gray-200" />
-            <span className="text-xs text-gray-400">{t('zone.or')}</span>
-            <div className="h-px flex-1 bg-gray-200" />
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setUseMagicLink(v => !v)}
-            className="mt-4 w-full text-sm text-primary-600 hover:underline"
-          >
-            {useMagicLink ? t('login.usePasswordInstead') : t('login.useMagicInstead')}
-          </button>
+          <h2 className="mb-1 text-lg font-semibold text-gray-900">{t('login.passwordTitle')}</h2>
+          <p className="mb-6 text-sm text-gray-500">{t('login.passwordSubtitle')}</p>
+          <EmailPasswordForm />
         </div>
 
         {/* Features */}

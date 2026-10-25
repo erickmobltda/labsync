@@ -13,7 +13,7 @@ import type { Medicine, MedicineStatus } from '@/types'
 
 export function MedicinesPage() {
   const { user } = useAuth()
-  const { medicines, loading, error, deleteMedicine } = useMedicines(user?.id)
+  const { medicines, loading, error, deleteMedicine } = useMedicines(user?.uid)
   const navigate = useNavigate()
   const { toasts, toast, close } = useToast()
   const { t } = useT()

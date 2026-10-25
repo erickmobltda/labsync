@@ -14,7 +14,7 @@ import { useT } from '@/lib/i18n'
 export function ReportDetailPage() {
   const { id } = useParams<{ id: string }>()
   const { user } = useAuth()
-  const { reports, fetchReportBiomarkers } = useReports(user?.id)
+  const { reports, fetchReportBiomarkers } = useReports(user?.uid)
   const navigate = useNavigate()
   const { t, tBiomarker, formatDate } = useT()
 

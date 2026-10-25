@@ -1,17 +1,16 @@
-import { supabase } from '@/lib/supabase'
 import type { ExtractedReport } from '@/types'
+import { apiFetch } from './api'
 import { resolveCategory } from './categories'
 import { computeStatus, parseReferenceRange } from './utils'
 
 export async function extractBiomarkers(rawText: string): Promise<ExtractedReport> {
-  const { data, error } = await supabase.functions.invoke('extract-biomarkers', {
-    body: { text: rawText },
+  const res = await apiFetch('/labsync/extract-biomarkers', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ text: rawText }),
   })
 
-  if (error) throw new Error(error.message)
-  if (data.error) throw new Error(data.error)
-
-  const parsed = data as ExtractedReport
+  const parsed = (await res.json()) as ExtractedReport
 
   const enriched = parsed.biomarkers.map(b => {
     const refRange = b.reference_text

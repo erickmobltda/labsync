@@ -15,7 +15,7 @@ type Step = 'upload' | 'extracting' | 'preview' | 'saving'
 
 export function UploadPage() {
   const { user } = useAuth()
-  const { saveReport } = useReports(user?.id)
+  const { saveReport } = useReports(user?.uid)
   const navigate = useNavigate()
   const { toasts, toast, close } = useToast()
   const { t } = useT()

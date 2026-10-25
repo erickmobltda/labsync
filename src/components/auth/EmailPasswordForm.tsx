@@ -1,23 +1,28 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Mail, Lock, ArrowRight, CheckCircle, Eye, EyeOff } from 'lucide-react'
+import { FirebaseError } from 'firebase/app'
+import { Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/hooks/useAuth'
 
-type Mode = 'signin' | 'signup'
+function authErrorMessage(err: unknown): string {
+  if (err instanceof FirebaseError) {
+    if (err.code === 'auth/invalid-credential') return 'Wrong email or password.'
+    if (err.code === 'auth/too-many-requests') return 'Too many attempts. Try again in a few minutes.'
+  }
+  return err instanceof Error ? err.message : 'Authentication failed'
+}
 
 export function EmailPasswordForm() {
   const navigate = useNavigate()
-  const { signInWithPassword, signUpWithPassword } = useAuth()
-  const [mode, setMode] = useState<Mode>('signin')
+  const { signInWithPassword } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [confirmationSent, setConfirmationSent] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -25,74 +30,17 @@ export function EmailPasswordForm() {
     setLoading(true)
     setError(null)
     try {
-      if (mode === 'signin') {
-        await signInWithPassword(email, password)
-        navigate('/dashboard')
-      } else {
-        const { needsConfirmation } = await signUpWithPassword(email, password)
-        if (needsConfirmation) {
-          setConfirmationSent(true)
-        } else {
-          navigate('/dashboard')
-        }
-      }
+      await signInWithPassword(email, password)
+      navigate('/dashboard')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Authentication failed')
+      setError(authErrorMessage(err))
     } finally {
       setLoading(false)
     }
   }
 
-  if (confirmationSent) {
-    return (
-      <div className="flex flex-col items-center gap-4 text-center py-4">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-green-50">
-          <CheckCircle className="h-7 w-7 text-green-600" />
-        </div>
-        <div>
-          <h3 className="font-semibold text-gray-900">Check your email</h3>
-          <p className="mt-1 text-sm text-gray-500">
-            We sent a confirmation link to <span className="font-medium text-gray-700">{email}</span>.
-            Click it to activate your account.
-          </p>
-        </div>
-        <button
-          className="text-sm text-primary-600 hover:underline"
-          onClick={() => {
-            setConfirmationSent(false)
-            setMode('signin')
-            setPassword('')
-          }}
-        >
-          Back to sign in
-        </button>
-      </div>
-    )
-  }
-
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <div className="grid grid-cols-2 gap-1 rounded-lg bg-gray-100 p-1 text-sm">
-        <button
-          type="button"
-          onClick={() => { setMode('signin'); setError(null) }}
-          className={`rounded-md py-1.5 font-medium transition ${
-            mode === 'signin' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          Sign in
-        </button>
-        <button
-          type="button"
-          onClick={() => { setMode('signup'); setError(null) }}
-          className={`rounded-md py-1.5 font-medium transition ${
-            mode === 'signup' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          Sign up
-        </button>
-      </div>
-
       <div className="space-y-1.5">
         <Label htmlFor="email">Email address</Label>
         <div className="relative">
@@ -117,12 +65,11 @@ export function EmailPasswordForm() {
           <Input
             id="password"
             type={showPassword ? 'text' : 'password'}
-            placeholder={mode === 'signup' ? 'At least 6 characters' : 'Your password'}
+            placeholder="Your password"
             value={password}
             onChange={e => setPassword(e.target.value)}
             className="pl-9 pr-9"
-            autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
-            minLength={mode === 'signup' ? 6 : undefined}
+            autoComplete="current-password"
             required
           />
           <button
@@ -145,10 +92,10 @@ export function EmailPasswordForm() {
 
       <Button type="submit" disabled={loading || !email || !password} className="w-full">
         {loading ? (
-          mode === 'signin' ? 'Signing in...' : 'Creating account...'
+          'Signing in...'
         ) : (
           <>
-            {mode === 'signin' ? 'Sign in' : 'Create account'}
+            Sign in
             <ArrowRight className="h-4 w-4" />
           </>
         )}

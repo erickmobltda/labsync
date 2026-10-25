@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { getDocs } from 'firebase/firestore'
+import { userCollection } from '@/lib/firebase'
 import { useT } from '@/lib/i18n'
 import type { BiomarkerWithDate } from '@/types'
 
@@ -21,35 +22,22 @@ export function useBiomarkers(userId?: string, filters: BiomarkerFilters = {}) {
     fetchBiomarkers()
   }, [userId, filters.startDate, filters.endDate, filters.category])
 
+  // A user has a few hundred biomarkers at most, so they are loaded in one
+  // read and filtered here (each one carries its report's report_date).
   async function fetchBiomarkers() {
     setLoading(true)
     setError(null)
-
-    let query = supabase
-      .from('biomarkers')
-      .select('*, lab_reports!inner(report_date)')
-      .order('created_at', { ascending: true })
-
-    if (filters.startDate) {
-      query = query.gte('lab_reports.report_date', filters.startDate)
-    }
-    if (filters.endDate) {
-      query = query.lte('lab_reports.report_date', filters.endDate)
-    }
-    if (filters.category && filters.category !== 'All') {
-      query = query.eq('category', filters.category)
-    }
-
-    const { data, error } = await query
-
-    if (error) {
-      setError(error.message)
-    } else {
-      const enriched = (data ?? []).map(b => ({
-        ...b,
-        report_date: (b.lab_reports as { report_date: string }).report_date,
-      })) as BiomarkerWithDate[]
-      setAllBiomarkers(enriched)
+    try {
+      const snap = await getDocs(userCollection('biomarkers'))
+      const rows = snap.docs
+        .map(d => ({ id: d.id, ...d.data() }) as BiomarkerWithDate)
+        .filter(b => !filters.startDate || b.report_date >= filters.startDate)
+        .filter(b => !filters.endDate || b.report_date <= filters.endDate)
+        .filter(b => !filters.category || filters.category === 'All' || b.category === filters.category)
+        .sort((a, b) => a.created_at.localeCompare(b.created_at))
+      setAllBiomarkers(rows)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load biomarkers')
     }
     setLoading(false)
   }

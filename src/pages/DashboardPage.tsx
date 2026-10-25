@@ -33,14 +33,14 @@ export function DashboardPage() {
   const [search, setSearch] = useState('')
   const [viewMode, setViewMode] = useState<ViewMode>('grouped')
 
-  const { biomarkers, grouped, loading, error } = useBiomarkers(user?.id, {
+  const { biomarkers, grouped, loading, error } = useBiomarkers(user?.uid, {
     startDate: startDate || undefined,
     endDate: endDate || undefined,
     category: activeCategory !== 'All' ? activeCategory : undefined,
     search: search || undefined,
   })
-  const { appointments } = useAppointments(user?.id)
-  const { medicines } = useMedicines(user?.id)
+  const { appointments } = useAppointments(user?.uid)
+  const { medicines } = useMedicines(user?.uid)
 
   const availableCategories = Array.from(
     new Set(biomarkers.map(b => b.category ?? 'Other'))

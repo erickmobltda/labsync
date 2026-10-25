@@ -1,8 +1,18 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { addDoc, deleteDoc, getDoc, getDocs, updateDoc } from 'firebase/firestore'
+import { currentUid, userCollection, userDoc } from '@/lib/firebase'
 import type { Appointment } from '@/types'
 
 export type AppointmentInput = Omit<Appointment, 'id' | 'user_id' | 'created_at'>
+
+// Newest date first; within a day, latest time first and untimed last.
+function byDateThenTimeDesc(a: Appointment, b: Appointment) {
+  if (a.date !== b.date) return b.date.localeCompare(a.date)
+  if (a.time === b.time) return 0
+  if (a.time === null) return 1
+  if (b.time === null) return -1
+  return b.time.localeCompare(a.time)
+}
 
 export function useAppointments(userId?: string) {
   const [appointments, setAppointments] = useState<Appointment[]>([])
@@ -17,55 +27,36 @@ export function useAppointments(userId?: string) {
 
   async function fetchAppointments() {
     setLoading(true)
-    const { data, error } = await supabase
-      .from('appointments')
-      .select('*')
-      .order('date', { ascending: false })
-      .order('time', { ascending: false, nullsFirst: false })
-    if (error) setError(error.message)
-    else setAppointments(data ?? [])
+    try {
+      const snap = await getDocs(userCollection('appointments'))
+      setAppointments(snap.docs.map(d => ({ id: d.id, ...d.data() }) as Appointment).sort(byDateThenTimeDesc))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load appointments')
+    }
     setLoading(false)
   }
 
   async function saveAppointment(input: AppointmentInput): Promise<Appointment> {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('Not authenticated')
-    const { data, error } = await supabase
-      .from('appointments')
-      .insert({ ...input, user_id: user.id })
-      .select()
-      .single()
-    if (error) throw error
+    const row = { ...input, user_id: currentUid(), created_at: new Date().toISOString() }
+    const ref = await addDoc(userCollection('appointments'), row)
     await fetchAppointments()
-    return data
+    return { id: ref.id, ...row }
   }
 
   async function updateAppointment(id: string, input: AppointmentInput): Promise<Appointment> {
-    const { data, error } = await supabase
-      .from('appointments')
-      .update(input)
-      .eq('id', id)
-      .select()
-      .single()
-    if (error) throw error
+    await updateDoc(userDoc('appointments', id), { ...input })
     await fetchAppointments()
-    return data
+    return (await getAppointment(id))!
   }
 
   async function deleteAppointment(id: string) {
-    const { error } = await supabase.from('appointments').delete().eq('id', id)
-    if (error) throw error
+    await deleteDoc(userDoc('appointments', id))
     setAppointments(prev => prev.filter(a => a.id !== id))
   }
 
   async function getAppointment(id: string): Promise<Appointment | null> {
-    const { data, error } = await supabase
-      .from('appointments')
-      .select('*')
-      .eq('id', id)
-      .maybeSingle()
-    if (error) throw error
-    return data
+    const snap = await getDoc(userDoc('appointments', id))
+    return snap.exists() ? ({ id: snap.id, ...snap.data() } as Appointment) : null
   }
 
   return {

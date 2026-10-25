@@ -15,7 +15,7 @@ type Tab = 'upcoming' | 'past'
 
 export function AppointmentsPage() {
   const { user } = useAuth()
-  const { appointments, loading, error, deleteAppointment } = useAppointments(user?.id)
+  const { appointments, loading, error, deleteAppointment } = useAppointments(user?.uid)
   const navigate = useNavigate()
   const { toasts, toast, close } = useToast()
   const { t } = useT()
