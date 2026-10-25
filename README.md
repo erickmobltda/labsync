@@ -2,7 +2,7 @@
 
 A personal health data app. Upload blood test PDFs, extract biomarkers automatically with AI, and track trends over time.
 
-**Live:** https://labsync.erickmob.com
+**Live:** https://labsync.erickmob.dev
 
 ## Features
 
@@ -17,7 +17,7 @@ A personal health data app. Upload blood test PDFs, extract biomarkers automatic
 
 | Piece | Where |
 |---|---|
-| Frontend | This repo, on GitHub Pages at `labsync.erickmob.com` |
+| Frontend | This repo, on GitHub Pages at `labsync.erickmob.dev` |
 | Login | Firebase Auth (project `erickmob-apps`, shared with the other apps). Sign-up is off: accounts are created in the Firebase console |
 | Data | Firestore, under `apps/labsync/users/{uid}/{reports,biomarkers,medicines,appointments}` |
 | AI extraction | [erickmob-api](https://github.com/erickmobltda/erickmob-api) `POST /labsync/extract-biomarkers` (the Anthropic key stays on the server) |
@@ -45,7 +45,7 @@ Open [http://localhost:5173/](http://localhost:5173/).
 |----------|-----------------|
 | `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_APP_ID` | `firebase apps:sdkconfig WEB <labsync appId> --project erickmob-apps` |
 | `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_PROJECT_ID` | `erickmob-apps.firebaseapp.com`, `erickmob-apps` |
-| `VITE_API_URL` | `https://api.erickmob.com` |
+| `VITE_API_URL` | `https://api.erickmob.dev` |
 
 The deploy workflow reads the same names from the repo's GitHub secrets.
 
