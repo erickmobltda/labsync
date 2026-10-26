@@ -14,6 +14,7 @@ export async function apiFetch(path: string, init: RequestInit = {}): Promise<Re
     try {
       const body = await res.json()
       if (body?.error) message = body.error
+      else if (typeof body?.detail === 'string') message = body.detail
     } catch {
       /* not JSON */
     }

@@ -12,6 +12,12 @@ const app = initializeApp({
 export const auth = getAuth(app)
 export const db = getFirestore(app)
 
+// Public sandbox account shared by the erickmob apps (custom claim `demo`): the
+// Firestore rules keep it inside its own data and erickmob-api refuses it the
+// AI extraction and PDF storage. Restore its sample data with `npm run reset-demo`.
+export const DEMO_EMAIL = 'demo@ledgenator.app'
+export const DEMO_PASSWORD = 'demo1234'
+
 export function currentUid(): string {
   const uid = auth.currentUser?.uid
   if (!uid) throw new Error('Not authenticated')
