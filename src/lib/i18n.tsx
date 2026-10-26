@@ -196,6 +196,9 @@ const dictionaries: Record<Language, Record<string, string>> = {
     'login.feat.upload': 'Envie PDF ou cole texto de qualquer relatório',
     'login.feat.trends': 'Acompanhe tendências de biomarcadores com gráficos interativos',
     'login.feat.private': 'Seus dados são privados e criptografados',
+    'login.demoButton': 'Testar a conta demo',
+    'login.demoLoading': 'Abrindo a demo…',
+    'login.demoHint': 'Explore exames de exemplo — sem precisar criar conta.',
 
     // Magic link form
     'magic.emailLabel': 'Endereço de e-mail',
@@ -556,6 +559,9 @@ const dictionaries: Record<Language, Record<string, string>> = {
     'login.feat.upload': 'Upload PDF or paste text from any lab report',
     'login.feat.trends': 'Track biomarker trends with interactive charts',
     'login.feat.private': 'Your data is private and encrypted',
+    'login.demoButton': 'Try the demo',
+    'login.demoLoading': 'Opening the demo…',
+    'login.demoHint': 'Explore sample lab reports — no sign-up needed.',
 
     'magic.emailLabel': 'Email address',
     'magic.placeholder': 'you@example.com',

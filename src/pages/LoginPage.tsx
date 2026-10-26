@@ -1,15 +1,31 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Activity, Shield, TrendingUp, FileText } from 'lucide-react'
 import { EmailPasswordForm } from '@/components/auth/EmailPasswordForm'
+import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/useAuth'
 import { useT } from '@/lib/i18n'
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher'
 
 export function LoginPage() {
-  const { user, loading } = useAuth()
+  const { user, loading, signInAsDemo } = useAuth()
   const navigate = useNavigate()
   const { t } = useT()
+  const [demoLoading, setDemoLoading] = useState(false)
+  const [demoError, setDemoError] = useState<string | null>(null)
+
+  async function tryDemo() {
+    setDemoLoading(true)
+    setDemoError(null)
+    try {
+      await signInAsDemo()
+      navigate('/dashboard')
+    } catch (err) {
+      setDemoError(err instanceof Error ? err.message : 'Authentication failed')
+    } finally {
+      setDemoLoading(false)
+    }
+  }
 
   useEffect(() => {
     if (!loading && user) navigate('/dashboard')
@@ -41,6 +57,18 @@ export function LoginPage() {
           <h2 className="mb-1 text-lg font-semibold text-gray-900">{t('login.passwordTitle')}</h2>
           <p className="mb-6 text-sm text-gray-500">{t('login.passwordSubtitle')}</p>
           <EmailPasswordForm />
+
+          <div className="mt-6 border-t border-gray-100 pt-6">
+            <Button variant="outline" className="w-full" onClick={tryDemo} disabled={demoLoading}>
+              {demoLoading ? t('login.demoLoading') : t('login.demoButton')}
+            </Button>
+            <p className="mt-2 text-center text-xs text-gray-500">{t('login.demoHint')}</p>
+            {demoError && (
+              <p className="mt-2 rounded-md bg-red-50 border border-red-100 px-3 py-2 text-sm text-red-700">
+                {demoError}
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Features */}

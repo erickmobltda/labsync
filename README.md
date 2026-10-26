@@ -13,6 +13,18 @@ A personal health data app. Upload blood test PDFs, extract biomarkers automatic
 - **Multi-language** — English and Brazilian Portuguese (PT-BR)
 - **Private** — each user only reaches their own data (Firestore security rules), and PDFs sit in a private bucket served only to their owner
 
+## Live demo
+
+Click **See a demo** on https://labsync.erickmob.dev (or **Try the demo** on the login page). It signs in with `demo@ledgenator.app` / `demo1234`, the public sandbox account shared by the erickmob apps.
+
+It comes with four check-ups (2025–2026) whose biomarkers trend over time, plus medicines and appointments. It's a **shared sandbox**: anyone can sign in and change it. AI extraction and PDF storage are off for the demo account (erickmob-api answers `403`); everything else works on its own data. To restore the sample data:
+
+```bash
+GOOGLE_APPLICATION_CREDENTIALS=/path/to/firebase-sa.json npm run reset-demo
+```
+
+It replaces the demo account's `reports`, `biomarkers`, `medicines` and `appointments` with `scripts/demo-seed.json` (and restores its password and `demo` claim).
+
 ## How it fits together
 
 | Piece | Where |

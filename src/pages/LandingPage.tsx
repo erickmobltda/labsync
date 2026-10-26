@@ -7,7 +7,7 @@ import { useT } from '@/lib/i18n'
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher'
 
 export function LandingPage() {
-  const { user, loading } = useAuth()
+  const { user, loading, signInAsDemo } = useAuth()
   const navigate = useNavigate()
   const { t } = useT()
 
@@ -89,7 +89,7 @@ export function LandingPage() {
             <Button size="lg" onClick={() => navigate('/login')}>
               {t('landing.startForFree')}
             </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate('/login')}>
+            <Button size="lg" variant="outline" onClick={() => signInAsDemo().catch(() => navigate('/login'))}>
               {t('landing.seeDemo')}
             </Button>
           </div>
